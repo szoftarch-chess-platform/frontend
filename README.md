@@ -1,8 +1,6 @@
 # frontend
 
-Web frontend of the online chess platform, a React + TypeScript single-page app built with [Vite](https://vite.dev/).
-
-The browser communicates only with the platform's API gateway (configured in the `infra` repo), never directly with the individual services.
+Web frontend of the online chess platform. Its stack and its access to the gateway are decided in [FE-ADR-1](docs/adr/stack.md) and [FE-ADR-2](docs/adr/gateway-access.md).
 
 > Status: minimal skeleton. The app currently only renders a placeholder page.
 
@@ -18,9 +16,7 @@ npm install
 npm run dev
 ```
 
-The app runs at http://localhost:5173.
-
-During development, requests to `/api` and `/ws` are proxied to the API gateway. By default the gateway is expected at `http://localhost:8080`. To change it, copy `.env.example` to `.env` and set `GATEWAY_URL`.
+The app runs at http://localhost:5173. To use another gateway address than the one in `.env.example`, copy it to `.env` and change `GATEWAY_URL`.
 
 ## Scripts
 
@@ -35,6 +31,7 @@ During development, requests to `/api` and `/ws` are proxied to the API gateway.
 
 ```
 frontend/
+├── docs/                 # documentation of the frontend
 ├── src/
 │   ├── main.tsx          # entry point, mounts the app into #root
 │   └── App.tsx           # root component
@@ -48,3 +45,7 @@ frontend/
 ├── tsconfig.node.json    # TypeScript settings for vite.config.ts
 └── package.json          # dependencies and scripts
 ```
+
+## Documentation
+
+The decisions, open questions and next steps of the frontend are in [docs/](docs/README.md).
