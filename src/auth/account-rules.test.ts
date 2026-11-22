@@ -53,6 +53,16 @@ describe('validateRegistration', () => {
     expect(validateRegistration({ ...valid, email }).email).toEqual([message]);
   });
 
+  it('counts the code points of an email address, as the server does', () => {
+    // 254 code points, but 2 more UTF-16 units.
+    const atTheLimit = `😀😀${'a'.repeat(240)}@example.com`;
+    expect(atTheLimit).toHaveLength(256);
+    expect(validateRegistration({ ...valid, email: atTheLimit })).toEqual({});
+    expect(
+      validateRegistration({ ...valid, email: `a${atTheLimit}` }).email,
+    ).toEqual(['The email address must be at most 254 characters long.']);
+  });
+
   it('refuses a password shorter than 8 code points', () => {
     expect(
       validateRegistration({ ...valid, password: 'short' }).password,

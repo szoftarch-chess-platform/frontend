@@ -4,8 +4,9 @@ import type {
   RegisterRequest,
 } from '../api/types/platform';
 
-// The rules of the accounts, which the platform-service checks too. The lengths of passwords
-// count Unicode code points, as the server does, not the UTF-16 units of `string.length`.
+// The rules of the accounts, which the platform-service checks too. The lengths of the passwords
+// and the email addresses count Unicode code points, as the contract and the server do, not the
+// UTF-16 units of `string.length`.
 
 const USER_NAME_PATTERN = /^[A-Za-z0-9_-]+$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+$/;
@@ -42,7 +43,7 @@ export function validateRegistration(request: RegisterRequest): FieldErrors {
 
   if (email === '') {
     add('email', 'The email address is required.');
-  } else if (email.length > EMAIL_MAX) {
+  } else if (codePointLength(email) > EMAIL_MAX) {
     add(
       'email',
       `The email address must be at most ${EMAIL_MAX} characters long.`,
