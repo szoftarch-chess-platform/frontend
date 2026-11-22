@@ -23,7 +23,7 @@ The first version covers the core features and the chess clock (ADR-1). The rout
 - The lobby and the game are separate pages. The lobby opens `/game` when `gameStarted` arrives or when `getState` reports a game. `/game` opens the lobby when the user has no game.
 - After `gameEnded` the user stays on `/game`, which shows the result, its reason and the final position with a button back to the lobby.
 - A guest who opens a page for signed-in users goes to `/login`. A signed-in user who opens `/login` or `/register` goes to `/`. There is no landing page.
-- The routing uses React Router 7 in its declarative library mode. The framework mode, its route modules and its loaders are not used.
+- The routing uses React Router 8 in its declarative library mode. The framework mode, its route modules and its loaders are not used.
 - A guard is a wrapper component that renders `Navigate`. The number of the history page comes from the `page` query parameter, and the app reads it as an integer of at least 1, otherwise as 1.
 
 ## Rationale

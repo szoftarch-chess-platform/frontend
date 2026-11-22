@@ -1,3 +1,11 @@
+import { Container, Heading } from '@chakra-ui/react';
+
 export function App() {
-  return <h1>Chess Platform</h1>;
+  return (
+    <Container py="8">
+      <Heading as="h1" size="2xl" color="brand.fg">
+        Chess Platform
+      </Heading>
+    </Container>
+  );
 }
