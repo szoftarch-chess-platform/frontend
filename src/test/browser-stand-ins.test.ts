@@ -31,4 +31,37 @@ describe('the Web Locks stand-in', () => {
   it('returns the value of the callback', async () => {
     await expect(navigator.locks.request('other', () => 42)).resolves.toBe(42);
   });
+
+  it('grants a free lock with ifAvailable', async () => {
+    const granted = await navigator.locks.request(
+      'free',
+      { ifAvailable: true },
+      (lock) => lock !== null,
+    );
+    expect(granted).toBe(true);
+  });
+
+  it('gives null with ifAvailable while the lock is held, without waiting', async () => {
+    let release!: () => void;
+    const held = navigator.locks.request(
+      'busy',
+      () => new Promise<void>((resolve) => (release = resolve)),
+    );
+
+    const lockWhileHeld = await navigator.locks.request(
+      'busy',
+      { ifAvailable: true },
+      (lock) => lock,
+    );
+    expect(lockWhileHeld).toBeNull();
+
+    release();
+    await held;
+    const lockAfterwards = await navigator.locks.request(
+      'busy',
+      { ifAvailable: true },
+      (lock) => lock,
+    );
+    expect(lockAfterwards).not.toBeNull();
+  });
 });

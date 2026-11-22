@@ -9,9 +9,9 @@ ADR-7 asks every consumer to replace its provider with a fake in its own repo, b
 ## Decision
 
 - The app reaches the services only through own interfaces in `src/api/`, which are `AuthApi`, `GamesApi` and `GameSocket`. The pages, the queries and the store depend only on these.
-- Every interface has a real implementation, on `apiFetch` and on socket.io-client, and a fake one in `src/api/fake/`.
+- Every interface has a real implementation, on the own HTTP client and on socket.io-client, and a fake one in `src/api/fake/`.
 - The fakes keep their data in memory, start from the examples of the contracts, and follow the rules of the contracts. Registration answers 409 for a user name or an email address that is taken. The fake socket checks the moves with chess.js, answers with a random legal move of the bot, pairs the queue with a fake opponent, runs the clocks and ends the game as ADR-10 describes. The tests can make the fakes refuse the next event or answer later.
-- `apiFetch` and the real socket are not used in the fake mode, so they have tests of their own.
+- The HTTP client and the real socket are not used in the fake mode, so they have tests of their own.
 - The fake mode is the Vite mode `fake`, which `npm run dev:fake` starts. The committed `.env.fake` sets `VITE_FAKE_BACKEND`.
 - One module chooses the implementation by this variable, and it imports the fakes dynamically, so the production build does not contain them.
 - In the fake mode the dev server runs on `http://localhost:5173` without the certificate and the proxy of FE-ADR-2, so it does not need the infra repo.
@@ -27,7 +27,7 @@ ADR-7 asks every consumer to replace its provider with a fake in its own repo, b
 
 ## Rejected alternatives
 
-- **Mock Service Worker for the REST API:** the real `apiFetch` would run against the fakes, but a second technique next to the fake of the socket. It can still be added later without changing the pages.
+- **Mock Service Worker for the REST API:** the real HTTP client would run against the fakes, but a second technique next to the fake of the socket. It can still be added later without changing the pages.
 - **A local fake server:** the most realistic, but a small backend of its own that ADR-7 avoids.
 - **A switch at runtime, such as a query parameter:** the fakes would be part of the production build.
 - **Fakes only in the tests:** no work in the browser before the services are ready.

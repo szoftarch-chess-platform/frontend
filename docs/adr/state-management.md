@@ -10,8 +10,8 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
 
 ## Decision
 
-- **REST:** TanStack Query 5 on top of an own `apiFetch` function.
-  - `apiFetch` sends the request, reads the ProblemDetails of an error, and on a 401 refreshes the tokens and repeats the request once.
+- **REST:** TanStack Query 5 on top of an own HTTP client.
+  - The HTTP client sends the request, reads the ProblemDetails of an error, and on a 401 refreshes the tokens and repeats the request once.
   - The refresh runs under a Web Lock, so only one tab refreshes at a time. A request that waited for the lock repeats itself first, and it refreshes only if it gets 401 again.
   - The signed-in user is the query `['me']` of `GET /api/users/me`. The guards, the header and the game page read it from there.
   - The history uses the queries `['games', page]`, which keep the previous page while the next one loads, and `['game', id]`.
@@ -23,7 +23,7 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
   - Components read the store with selectors, so a change of the clock renders only the clocks.
   - The changes of the state are pure functions, such as `applyMoveMade(state, event)`.
   - Sign-out resets the store.
-- The same refresh function serves `apiFetch` and the reconnect of the socket after `connect_error`.
+- The same refresh function serves the HTTP client and the reconnect of the socket after `connect_error`.
 
 ## Rationale
 
