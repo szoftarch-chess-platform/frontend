@@ -12,12 +12,15 @@ The pages need forms, buttons, dialogs, notifications, tables and loading states
 - The theme is one system made with `createSystem` in `src/theme/`. It defines the tokens, such as colors, fonts and radii, and the semantic tokens that the components use, such as the colors of the squares, of the highlights and of a clock that runs low.
 - The components use only semantic tokens and no raw color values. A new theme gives the semantic tokens new values.
 - The board is not a Chakra component, so its colors read the CSS variables that Chakra creates for the semantic tokens.
+- The colors of the squares are the one distinctive element of the app's look. The lobby opens with a deep green band that shows a read-only board of react-chessboard in an opening position, its two choices carry a light and a dark square, and the logo is four squares. The rest stays quiet, with rounded surfaces, pill buttons and the system fonts.
+- Pieces are always the SVG pieces of react-chessboard, never the chess symbols of Unicode.
 - The parts that Chakra 3 ships as snippets, such as the toaster and the password field, are copied into `src/components/ui/` with its CLI.
 - The types of the own tokens are generated with the typegen command of the Chakra CLI.
 
 ## Rationale
 
 - The team asked for unified styling and for themes that are easy to change.
+- The chess symbols of Unicode are drawn by whatever font the system has, so their shape and even their fill differ between the platforms, while the SVG pieces look the same everywhere.
 - Semantic tokens give every color one name and one place, so a theme is a set of values, and the board follows it through the CSS variables.
 - Chakra ships accessible forms, dialogs, notifications and tables, so the pages do not build them.
 - It is under the MIT license.

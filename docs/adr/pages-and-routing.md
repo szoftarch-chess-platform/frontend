@@ -14,7 +14,7 @@ The first version covers the core features and the chess clock (ADR-1). The rout
 |---|---|---|
 | `/login` | sign-in | guests only |
 | `/register` | registration | guests only |
-| `/` | lobby, with the queue and the game against the bot | signed-in users |
+| `/` | lobby, with the queue, the game against the bot and the last three finished games | signed-in users |
 | `/game` | the current live game | signed-in users |
 | `/history` | the finished games of the user, one page at a time | signed-in users |
 | `/history/:gameId` | a finished game, replayed move by move | signed-in users |

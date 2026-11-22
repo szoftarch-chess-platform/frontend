@@ -1,10 +1,18 @@
 import type { GameSocket } from '../api/game-socket';
-import { applyState, initialGameStore, useGameStore } from './store';
+import {
+  applyGameStarted,
+  applyState,
+  initialGameStore,
+  useGameStore,
+} from './store';
 
 export const STATE_RETRY_MS = 2000;
 
 /** Connects the socket and keeps the store in step with it. Returns the function that stops it. */
-export function startGameConnection(socket: GameSocket): () => void {
+export function startGameConnection(
+  socket: GameSocket,
+  onGameStarted: () => void,
+): () => void {
   let stopped = false;
   let retry: ReturnType<typeof setTimeout> | undefined;
 
@@ -30,6 +38,10 @@ export function startGameConnection(socket: GameSocket): () => void {
     clearTimeout(retry);
     void askState();
   });
+  const offGameStarted = socket.on('gameStarted', ({ game }) => {
+    useGameStore.setState((store) => applyGameStarted(store, game));
+    onGameStarted();
+  });
   const offDisconnect = socket.on('disconnect', () => {
     clearTimeout(retry);
     useGameStore.setState({ connection: 'lost' });
@@ -40,6 +52,7 @@ export function startGameConnection(socket: GameSocket): () => void {
     stopped = true;
     clearTimeout(retry);
     offConnect();
+    offGameStarted();
     offDisconnect();
     socket.disconnect();
     useGameStore.setState(initialGameStore, true);

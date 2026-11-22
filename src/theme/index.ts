@@ -36,6 +36,34 @@ const config = defineConfig({
           emphasized: { value: '{colors.brand.200}' },
           focusRing: { value: '{colors.brand.500}' },
         },
+        board: {
+          light: { value: '#dde8cf' },
+          dark: { value: '{colors.brand.700}' },
+        },
+        highlight: {
+          lastMove: { value: 'rgba(214, 222, 96, 0.7)' },
+        },
+        // The band at the top of the lobby.
+        hero: {
+          bg: { value: '{colors.brand.800}' },
+          fg: { value: 'white' },
+          subtle: { value: '{colors.whiteAlpha.200}' },
+        },
+        // The result of a finished game from the side of the user.
+        outcome: {
+          won: {
+            bg: { value: '{colors.green.100}' },
+            fg: { value: '{colors.green.800}' },
+          },
+          lost: {
+            bg: { value: '{colors.red.100}' },
+            fg: { value: '{colors.red.800}' },
+          },
+          other: {
+            bg: { value: '{colors.gray.100}' },
+            fg: { value: '{colors.gray.700}' },
+          },
+        },
       },
     },
   },

@@ -1,14 +1,17 @@
 import {
+  Avatar,
   Box,
   Button,
   Container,
   Flex,
+  Grid,
   HStack,
   Link,
   Text,
 } from '@chakra-ui/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link as RouterLink, Outlet } from 'react-router';
+import type { ReactNode } from 'react';
+import { NavLink, Link as RouterLink, Outlet } from 'react-router';
 import { useBackend } from '../api/backend-context';
 import { setSignedOut, useCurrentUser } from '../auth/current-user';
 import { FakeBackendBadge } from './FakeBackendBadge';
@@ -27,31 +30,36 @@ export function AppLayout() {
   });
 
   return (
-    <Box minH="100vh" bg="bg.subtle">
+    <Box minH="100vh" bg="bg.subtle" overflowX="clip">
       <Box as="header" bg="bg" borderBottomWidth="1px">
         <Container>
-          <Flex h="14" align="center" justify="space-between" gap="6">
+          <Flex h="16" align="center" justify="space-between" gap="6">
             <HStack gap="3">
               <Link
                 asChild
+                display="flex"
+                alignItems="center"
+                gap="2.5"
                 fontWeight="bold"
                 fontSize="lg"
-                color="brand.fg"
+                letterSpacing="tight"
                 textDecoration="none"
+                _hover={{ textDecoration: 'none' }}
               >
-                <RouterLink to="/">Chess Platform</RouterLink>
+                <RouterLink to="/">
+                  <BoardMark />
+                  Chess Platform
+                </RouterLink>
               </Link>
               <FakeBackendBadge />
             </HStack>
 
             {user && (
-              <HStack as="nav" aria-label="Main" gap="5" flex="1">
-                <Link asChild>
-                  <RouterLink to="/">Lobby</RouterLink>
-                </Link>
-                <Link asChild>
-                  <RouterLink to="/history">History</RouterLink>
-                </Link>
+              <HStack as="nav" aria-label="Main" gap="1" flex="1">
+                <NavItem to="/" end>
+                  Lobby
+                </NavItem>
+                <NavItem to="/history">History</NavItem>
               </HStack>
             )}
 
@@ -62,10 +70,16 @@ export function AppLayout() {
                     Sign-out failed. Try again.
                   </Text>
                 )}
-                <Text color="fg.muted">{user.userName}</Text>
+                <HStack gap="2">
+                  <Avatar.Root size="xs" colorPalette="brand">
+                    <Avatar.Fallback name={user.userName} />
+                  </Avatar.Root>
+                  <Text fontWeight="medium">{user.userName}</Text>
+                </HStack>
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="ghost"
+                  rounded="full"
                   loading={signOut.isPending}
                   onClick={() => signOut.mutate()}
                 >
@@ -77,9 +91,57 @@ export function AppLayout() {
         </Container>
       </Box>
 
-      <Container as="main" py="8">
+      <Container as="main" py="10">
         <Outlet />
       </Container>
     </Box>
+  );
+}
+
+function NavItem({
+  to,
+  end,
+  children,
+}: {
+  to: string;
+  end?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      asChild
+      px="3"
+      py="1.5"
+      rounded="full"
+      fontWeight="medium"
+      color="fg.muted"
+      textDecoration="none"
+      _hover={{ bg: 'bg.muted', textDecoration: 'none' }}
+      css={{
+        '&[aria-current=page]': { bg: 'brand.subtle', color: 'brand.fg' },
+      }}
+    >
+      <NavLink to={to} end={end}>
+        {children}
+      </NavLink>
+    </Link>
+  );
+}
+
+/** Four squares of the board as the logo. */
+function BoardMark() {
+  return (
+    <Grid
+      aria-hidden
+      templateColumns="repeat(2, 1fr)"
+      boxSize="6"
+      rounded="md"
+      overflow="hidden"
+    >
+      <Box bg="board.light" />
+      <Box bg="board.dark" />
+      <Box bg="board.dark" />
+      <Box bg="board.light" />
+    </Grid>
   );
 }

@@ -24,7 +24,7 @@ describe('on start', () => {
     await backend.auth.login({ userName: 'alice', password: EXAMPLE_PASSWORD });
 
     renderWithProviders(<App />, { route: '/', backend });
-    expect(await heading('Lobby')).toBeInTheDocument();
+    expect(await heading('Start a game')).toBeInTheDocument();
   });
 
   it('offers a retry instead of the sign-in page when the user cannot be loaded', async () => {
@@ -39,7 +39,7 @@ describe('on start', () => {
     renderWithProviders(<App />, { route: '/', backend, queryClient });
     await userEvent.click(await screen.findByRole('button', { name: 'Retry' }));
 
-    expect(await heading('Lobby')).toBeInTheDocument();
+    expect(await heading('Start a game')).toBeInTheDocument();
   });
 });
 
@@ -96,7 +96,7 @@ describe('sign-in', () => {
     await fill('Password', EXAMPLE_PASSWORD);
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
-    expect(await heading('Lobby')).toBeInTheDocument();
+    expect(await heading('Start a game')).toBeInTheDocument();
     expect(screen.getByText('alice')).toBeInTheDocument();
   });
 });
@@ -170,7 +170,7 @@ describe('registration', () => {
     await fill('Password', EXAMPLE_PASSWORD);
     await userEvent.click(screen.getByRole('button', { name: 'Register' }));
 
-    expect(await heading('Lobby')).toBeInTheDocument();
+    expect(await heading('Start a game')).toBeInTheDocument();
     expect(screen.getByText('carol')).toBeInTheDocument();
   });
 });
@@ -183,7 +183,7 @@ describe('sign-out', () => {
       route: '/',
       backend,
     });
-    await heading('Lobby');
+    await heading('Start a game');
     queryClient.setQueryData(['games', 1], { items: [] });
 
     await userEvent.click(screen.getByRole('button', { name: 'Sign out' }));
@@ -199,7 +199,7 @@ describe('sign-out', () => {
     await backend.auth.login({ userName: 'alice', password: EXAMPLE_PASSWORD });
     vi.spyOn(backend.auth, 'logout').mockRejectedValue(new ApiError(503));
     renderWithProviders(<App />, { route: '/', backend });
-    await heading('Lobby');
+    await heading('Start a game');
 
     await userEvent.click(screen.getByRole('button', { name: 'Sign out' }));
 
@@ -207,7 +207,7 @@ describe('sign-out', () => {
       'Sign-out failed. Try again.',
     );
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Lobby' }),
+      screen.getByRole('heading', { level: 1, name: 'Start a game' }),
     ).toBeInTheDocument();
   });
 });

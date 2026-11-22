@@ -2,7 +2,7 @@
 
 Web frontend of the online chess platform. Its decisions are listed in [docs/](docs/README.md).
 
-> Status: registration, sign-in and sign-out work, and a signed-in user is connected to the game-service. The lobby, the game and the history are placeholders.
+> Status: registration, sign-in and sign-out work, and the lobby finds an opponent or starts a game against the computer. The game and the history are placeholders.
 
 ## Requirements
 
@@ -83,6 +83,7 @@ frontend/
 │   ├── auth/                 # the signed-in user
 │   ├── game/                 # the store of the live game and the socket connection
 │   ├── layout/               # the header and the frame of the pages
+│   ├── lobby/                # the parts of the lobby page
 │   ├── pages/                # one component for each page
 │   ├── routing/              # the guards and the parsing of route parameters
 │   ├── theme/                # the Chakra theme with its tokens
