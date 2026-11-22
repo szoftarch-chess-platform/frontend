@@ -78,7 +78,7 @@ describe('validateRegistration', () => {
   it('counts an emoji as one character, as the server does', () => {
     // 7 emojis are 14 UTF-16 units but only 7 code points.
     const password = '😀'.repeat(7);
-    expect(password.length).toBe(14);
+    expect(password).toHaveLength(14);
     expect(validateRegistration({ ...valid, password }).password).toEqual([
       'The password must be at least 8 characters long.',
     ]);
