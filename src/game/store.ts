@@ -23,3 +23,15 @@ export function applyState(store: GameStore, state: State): GameStore {
     game: state.game,
   };
 }
+
+export function applyGameStarted(store: GameStore, game: GameState): GameStore {
+  return { ...store, status: 'playing', game };
+}
+
+export function applyQueueJoined(store: GameStore): GameStore {
+  return store.status === 'idle' ? { ...store, status: 'queued' } : store;
+}
+
+export function applyQueueLeft(store: GameStore): GameStore {
+  return store.status === 'queued' ? { ...store, status: 'idle' } : store;
+}

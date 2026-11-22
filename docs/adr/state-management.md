@@ -14,7 +14,7 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
   - The HTTP client sends the request, reads the ProblemDetails of an error, and on a 401 refreshes the tokens and repeats the request once.
   - The refresh runs under a Web Lock, so only one tab refreshes at a time. A request that waited for the lock repeats itself first, and it refreshes only if it gets 401 again.
   - The signed-in user is the query `['me']` of `GET /api/users/me`. The guards, the header and the game page read it from there.
-  - The history uses the queries `['games', page]`, which keep the previous page while the next one loads, and `['game', id]`.
+  - The history uses the queries `['games', page]`, which keep the previous page while the next one loads, and `['game', id]`. The lobby shows the last three games with `['games', 'recent']`.
   - Registration and sign-in are mutations that write the returned user into `['me']`. Sign-out clears the whole cache.
   - Answers with a status from 400 to 499 are not retried.
 - **Live game:** one Zustand store.
@@ -26,6 +26,7 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
 - **Socket:** the connection to `/ws/game` is open while a user is signed in, on every page, and it closes on sign-out and when the session ends.
   - After every connect the client asks `getState` and puts the answer into the store. If the game-service refuses it, the client asks again every 2 seconds while the connection stays open.
   - The browser does not see why a handshake failed, so after `connect_error` the client refreshes the tokens with the same function as the HTTP client, while Socket.IO keeps retrying. After a successful refresh it does not refresh again until a connect succeeds. A refresh that failed is tried again at the next `connect_error`, and a refresh answered with 401 signs the user out. When the game-service closes the connection itself, the client connects again.
+  - The lobby sends `joinQueue`, `leaveQueue` and `startBotGame` with their controls disabled until `getState` has answered. A refusal with `alreadyInQueue`, `alreadyInGame` or `notInQueue` means that another tab acted first, so the lobby asks `getState` and follows it without a message. Any other refusal shows one general message.
   - Until `getState` has answered, the lobby and the game page show a banner, which says that the connection is lost after a disconnect.
 
 ## Rationale
@@ -37,6 +38,7 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
 - Pure functions for the changes can be tested without a socket.
 - The game-service keeps the user in the queue and in the game whether a socket is open or not, and the clock runs on. With the socket open on every page, no event is missed while the user looks at the history.
 - The access token lives 15 minutes, so a reconnect after a longer connection often fails until the tokens are refreshed. After a successful refresh the client waits for a connect, so a game-service that is down does not cause a refresh at every retry.
+- The game-service sends no event when another tab joins or leaves the queue, so a refusal caused by another tab is answered by the state of the server instead of an error that the user cannot act on.
 - A refused `getState` is most likely a passing failure of the game-service, and a retry needs no text for the users, whose wording is still open.
 - The Web Locks API is supported by Chrome, Firefox and Edge, which NF-7 names, and it is the way that the identity providers send one refresh across tabs, as ADR-4 describes.
 
@@ -54,6 +56,7 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
 ## Consequences
 
 - jsdom has no Web Locks API, so the tests replace it (FE-ADR-8).
+- The acknowledgement of `joinQueue` can arrive after `gameStarted`, so it does not turn a started game back into waiting.
 - The game page must not depend on the order of the acknowledgement of `makeMove` and of `moveMade`, and `gameEnded` also puts back a move that waits for its acknowledgement.
 - These decisions affect other repos:
   - Every signed-in tab keeps a connection to the game-service, also outside the lobby and the game page, which counts toward its load (NF-6).

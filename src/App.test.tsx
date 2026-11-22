@@ -31,7 +31,7 @@ describe('the routes of a guest', () => {
 
 describe('the routes of a signed-in user', () => {
   it.each([
-    ['/', 'Lobby'],
+    ['/', 'Start a game'],
     ['/game', 'Game'],
     ['/history', 'History'],
     ['/history/0193c2bf-0a1b-7c2d-9e3f-4a5b6c7d8e9f', 'Finished game'],
@@ -42,12 +42,12 @@ describe('the routes of a signed-in user', () => {
 
   it('redirect the sign-in page to the lobby', async () => {
     renderWithProviders(<App />, { route: '/login', user: alice });
-    expect(await heading('Lobby')).toBeInTheDocument();
+    expect(await heading('Start a game')).toBeInTheDocument();
   });
 
   it('show the user name and the navigation', async () => {
     renderWithProviders(<App />, { route: '/', user: alice });
-    await heading('Lobby');
+    await heading('Start a game');
     expect(screen.getByText('alice')).toBeInTheDocument();
     expect(
       screen.getByRole('navigation', { name: 'Main' }),
