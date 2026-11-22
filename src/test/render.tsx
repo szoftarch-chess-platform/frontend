@@ -30,7 +30,7 @@ export function renderWithProviders(
     route = '/',
     user,
     queryClient = createQueryClient(),
-    backend = createFakeBackend(),
+    backend = createFakeBackend({ delayMs: 0 }),
   }: RenderOptions = {},
 ): RenderResult & { queryClient: QueryClient; backend: Backend } {
   if (user !== undefined) {

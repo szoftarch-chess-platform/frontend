@@ -27,9 +27,9 @@
 
 ## Next steps
 
-- Fake the REST API and the Socket.IO protocol from the examples of the contracts (FE-ADR-9).
 - Build registration and sign-in with the rules of ADR-4 checked in the forms, the field errors of the 400 and 409 answers, the signed-in user from `GET /api/users/me`, and sign-out that closes the Socket.IO connection.
 - Write the types of the contract `game-service.asyncapi.yaml` (FE-ADR-10), and build the connection to `/ws/game` with the refresh after `connect_error` and `getState` after every connect (ADR-4).
+- Fake the Socket.IO protocol from the examples of the contract `game-service.asyncapi.yaml` (FE-ADR-9), together with the connection to `/ws/game`.
 - Build the lobby with joining and leaving the queue and starting a game against the bot.
 - Build the game page with the legal moves of chess.js highlighted (ADR-9), the moves sent with acknowledgements, the piece put back after a refusal, the clocks counted down locally (ADR-8), resignation, and the result with its reason (ADR-10).
 - Build the history with paging, and a finished game replayed move by move with chess.js (F-6).

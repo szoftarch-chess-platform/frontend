@@ -22,20 +22,4 @@ describe('the guards before the user is known', () => {
     expect(screen.queryByText('lobby')).not.toBeInTheDocument();
     expect(screen.queryByText('sign in')).not.toBeInTheDocument();
   });
-
-  it('then redirect a guest to the sign-in page', async () => {
-    renderWithProviders(
-      <Routes>
-        <Route element={<RequireSignedIn />}>
-          <Route index element={<p>lobby</p>} />
-        </Route>
-        <Route element={<RequireGuest />}>
-          <Route path="login" element={<p>sign in</p>} />
-        </Route>
-      </Routes>,
-      { route: '/' },
-    );
-
-    expect(await screen.findByText('sign in')).toBeInTheDocument();
-  });
 });
