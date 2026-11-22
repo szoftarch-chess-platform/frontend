@@ -11,6 +11,7 @@ The gateway does not serve static files, so the frontend needs a container that 
 - The multi-stage `Dockerfile` builds the app with `node:26-alpine` and copies the build into `nginx/nginx-unprivileged:1.30-alpine`.
 - nginx runs as the non-root user `nginx` and listens on port 8080. The `Dockerfile` names the user, although the base image already sets it.
 - A path that is not a file gets `index.html`, so a page of the SPA also loads from a direct link.
+- The build stage runs on the platform of the build machine with `--platform=$BUILDPLATFORM`, and the image is published for amd64 and arm64 as ADR-2 decides.
 
 ## Rationale
 
@@ -19,6 +20,7 @@ The gateway does not serve static files, so the frontend needs a container that 
 - With the user named in the `Dockerfile`, the image stays non-root even if the base image is replaced, and the tools that check the file can see it.
 - 1.30 is the stable release line of nginx. The tag follows its patch releases, while the `stable` tag would move to the next release line on its own.
 - The build stage uses the Node.js version that the developers use.
+- The static files of the build are the same on every architecture, so the build stage needs no emulation, and only the nginx stage differs between amd64 and arm64.
 
 ## Rejected alternatives
 
