@@ -6,7 +6,7 @@ const MAX_RETRIES = 2;
 /**
  * Whether TanStack Query tries a failed query again (FE-ADR-5). An answer from 400 to 499 is
  * final, because the same request would get the same answer. The refresh after a 401 belongs to
- * `apiFetch`, not to the retry of the query. Other errors, such as a lost connection, are tried
+ * the HTTP client, not to the retry of the query. Other errors, such as a lost connection, are tried
  * again.
  */
 export function shouldRetry(failureCount: number, error: unknown): boolean {
@@ -22,7 +22,6 @@ export function createQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
       queries: { retry: shouldRetry },
-      // A mutation, such as a sign-in, is never repeated on its own.
       mutations: { retry: false },
     },
   });
