@@ -20,7 +20,7 @@ The first version covers the core features and the chess clock (ADR-1). The rout
 | `/history/:gameId` | a finished game, replayed move by move | signed-in users |
 
 - `/game` has no id in its path, because a user has at most one game.
-- The lobby and the game are separate pages. The lobby opens `/game` when `gameStarted` arrives or when `getState` reports a game. `/game` opens the lobby when the user has no game.
+- The lobby and the game are separate pages. Every signed-in page opens `/game` when `gameStarted` arrives, and the lobby opens it when `getState` reports a game. `/game` opens the lobby when the user has no game.
 - After `gameEnded` the user stays on `/game`, which shows the result, its reason and the final position with a button back to the lobby.
 - A guest who opens a page for signed-in users goes to `/login`. A signed-in user who opens `/login` or `/register` goes to `/`. There is no landing page.
 - The routing uses React Router 8 in its declarative library mode. The framework mode, its route modules and its loaders are not used.
@@ -31,6 +31,7 @@ The first version covers the core features and the chess clock (ADR-1). The rout
 - The id of the game would only repeat what `getState` already returns, and nobody else can open the game of a user.
 - Separate pages for the lobby and the game are easier to build and to test, and a reload loses nothing, because `getState` restores the state.
 - On the result page the user can still look at the final position.
+- A game can start while the user is on another page, for example after a pairing in the queue or a game started in another tab, and its clock runs from the start.
 - A guest can only register or sign in in the first version, so a landing page would show nothing else.
 - React Router is the most widely used router of React, so the team knows it and finds the most examples. The app has six routes, and its declarative mode covers guards, a route parameter and a query parameter. The data loading belongs to TanStack Query (FE-ADR-5), so the loaders are not needed.
 
