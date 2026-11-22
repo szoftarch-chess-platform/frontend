@@ -36,25 +36,6 @@ const config = defineConfig({
           emphasized: { value: '{colors.brand.200}' },
           focusRing: { value: '{colors.brand.500}' },
         },
-        // The squares of the board. The board is not a Chakra component, so it reads these
-        // through their CSS variables (FE-ADR-6).
-        board: {
-          light: { value: '#f0d9b5' },
-          dark: { value: '#b58863' },
-        },
-        // The marks on the board.
-        highlight: {
-          legalMove: { value: 'rgba(20, 85, 30, 0.5)' },
-          lastMove: { value: 'rgba(155, 199, 0, 0.41)' },
-          check: { value: 'rgba(220, 38, 38, 0.6)' },
-          selected: { value: 'rgba(20, 85, 30, 0.35)' },
-        },
-        // The clocks of a live game.
-        clock: {
-          running: { value: '{colors.fg}' },
-          idle: { value: '{colors.fg.muted}' },
-          low: { value: '{colors.red.600}' },
-        },
       },
     },
   },

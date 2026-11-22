@@ -51,41 +51,11 @@ export class InMemoryLockManager {
   }
 }
 
-class NoopResizeObserver {
-  observe(): void {}
-  unobserve(): void {}
-  disconnect(): void {}
-}
-
 export function installBrowserStandIns(): void {
   if (!('locks' in navigator)) {
     Object.defineProperty(navigator, 'locks', {
       configurable: true,
       value: new InMemoryLockManager(),
-    });
-  }
-
-  if (typeof window.matchMedia !== 'function') {
-    Object.defineProperty(window, 'matchMedia', {
-      configurable: true,
-      value: (query: string): MediaQueryList =>
-        ({
-          matches: false,
-          media: query,
-          onchange: null,
-          addEventListener: () => {},
-          removeEventListener: () => {},
-          addListener: () => {},
-          removeListener: () => {},
-          dispatchEvent: () => false,
-        }) as MediaQueryList,
-    });
-  }
-
-  if (typeof window.ResizeObserver !== 'function') {
-    Object.defineProperty(window, 'ResizeObserver', {
-      configurable: true,
-      value: NoopResizeObserver,
     });
   }
 }

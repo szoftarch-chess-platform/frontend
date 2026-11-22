@@ -5,12 +5,12 @@ import { App } from './App';
 import { loadBackend } from './api';
 import { AppProviders } from './app/AppProviders';
 import { createQueryClient } from './app/query-client';
-import { currentUserQueryKey } from './auth/current-user';
+import { setSignedOut } from './auth/current-user';
 
 const queryClient = createQueryClient();
 
 loadBackend({
-  onSessionExpired: () => queryClient.setQueryData(currentUserQueryKey, null),
+  onSessionExpired: () => setSignedOut(queryClient),
 }).then((backend) => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
