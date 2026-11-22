@@ -1,5 +1,6 @@
 import type { Backend, BackendOptions } from '../backend';
 import { createAuthApi } from './auth-api';
+import { createGameSocket } from './game-socket';
 import { createGamesApi } from './games-api';
 import { createHttpClient } from './http-client';
 
@@ -12,5 +13,6 @@ export function createBackend({
     kind: 'real',
     auth: createAuthApi(http),
     games: createGamesApi(http),
+    gameSocket: createGameSocket(http.refreshAfterUnauthorized),
   };
 }

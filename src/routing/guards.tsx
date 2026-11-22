@@ -2,12 +2,25 @@ import { Button, Center, Spinner, Stack, Text } from '@chakra-ui/react';
 import type { ReactNode } from 'react';
 import { Navigate, Outlet } from 'react-router';
 import { useCurrentUser } from '../auth/current-user';
+import { GameConnection } from '../game/GameConnection';
 
-/** The pages for signed-in users. A guest goes to the sign-in page. */
+/**
+ * The pages for signed-in users, with the socket open on all of them. A guest goes to the sign-in
+ * page, which also closes the socket on sign-out.
+ */
 export function RequireSignedIn() {
   return (
     <WhenUserKnown>
-      {(signedIn) => (signedIn ? <Outlet /> : <Navigate to="/login" replace />)}
+      {(signedIn) =>
+        signedIn ? (
+          <>
+            <GameConnection />
+            <Outlet />
+          </>
+        ) : (
+          <Navigate to="/login" replace />
+        )
+      }
     </WhenUserKnown>
   );
 }
