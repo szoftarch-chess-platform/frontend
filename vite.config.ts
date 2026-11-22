@@ -24,6 +24,12 @@ export default defineConfig(({ command, mode }) => {
     return { plugins: [react()] };
   }
 
+  // The fake mode (npm run dev:fake) answers every request in the browser, so it needs neither
+  // the gateway nor its certificate, and it runs without the infra repo on plain HTTP.
+  if (mode === 'fake') {
+    return { plugins: [react()], server: { port: 5173 } };
+  }
+
   const env = loadEnv(mode, '.', '');
   const gateway = env.GATEWAY_URL || 'https://localhost:8443';
 

@@ -10,6 +10,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Link as RouterLink, Outlet, useNavigate } from 'react-router';
 import { currentUserQueryKey, useCurrentUser } from '../auth/current-user';
+import { FakeBackendBadge } from './FakeBackendBadge';
 
 /** The header with the navigation, and the page below it. */
 export function AppLayout() {
@@ -32,15 +33,18 @@ export function AppLayout() {
       <Box as="header" bg="bg" borderBottomWidth="1px">
         <Container>
           <Flex h="14" align="center" justify="space-between" gap="6">
-            <Link
-              asChild
-              fontWeight="bold"
-              fontSize="lg"
-              color="brand.fg"
-              textDecoration="none"
-            >
-              <RouterLink to="/">Chess Platform</RouterLink>
-            </Link>
+            <HStack gap="3">
+              <Link
+                asChild
+                fontWeight="bold"
+                fontSize="lg"
+                color="brand.fg"
+                textDecoration="none"
+              >
+                <RouterLink to="/">Chess Platform</RouterLink>
+              </Link>
+              <FakeBackendBadge />
+            </HStack>
 
             {user && (
               <HStack as="nav" aria-label="Main" gap="5" flex="1">

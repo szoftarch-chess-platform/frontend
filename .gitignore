@@ -24,7 +24,8 @@ coverage
 *.sln
 *.sw?
 
-# Env files (keep the example)
+# Env files (keep the example and the settings of the fake mode)
 .env
 .env.*
 !.env.example
+!.env.fake

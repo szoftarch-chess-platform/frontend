@@ -13,7 +13,8 @@
     "test:cov": "vitest run --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "theme:types": "chakra typegen src/theme/index.ts"
+    "theme:types": "chakra typegen src/theme/index.ts",
+    "dev:fake": "vite --mode fake"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.38.0",
