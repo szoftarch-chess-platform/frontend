@@ -1,6 +1,6 @@
 # Node builds the SPA, and nginx serves the static files of the build.
 
-FROM node:26-alpine AS build
+FROM --platform=$BUILDPLATFORM node:26-alpine AS build
 WORKDIR /app
 
 # The dependencies are installed in a separate layer, which only depends on the package files.

@@ -27,8 +27,6 @@
 
 ## Next steps
 
-- Set up the libraries of FE-ADR-4 to FE-ADR-8, the theme, the pages with their guards, the fake mode of FE-ADR-9, the tests and the formatting, and update the README.
-- Add the CI workflow of ADR-2, which lints, checks the format, tests and builds on every pull request and publishes the image for a version tag.
 - Write the types of the contracts `platform-service.openapi.yaml`, `game-service.asyncapi.yaml` and `shared-schemas.yaml` (FE-ADR-10), and `apiFetch` with the refresh of FE-ADR-5.
 - Fake the REST API and the Socket.IO protocol from the examples of the contracts (FE-ADR-9).
 - Build registration and sign-in with the rules of ADR-4 checked in the forms, the field errors of the 400 and 409 answers, the signed-in user from `GET /api/users/me`, and sign-out that closes the Socket.IO connection.

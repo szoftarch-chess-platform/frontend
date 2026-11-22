@@ -1,0 +1,100 @@
+# Checks and tests every pull request and every push to dev and main, and builds the image.
+# A version tag such as v1.0.0 also publishes the image for amd64 and arm64.
+
+name: Frontend
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+    tags:
+      - 'v*.*.*'
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to the same pull request makes the older run pointless.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install the dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check the format
+        run: npm run format:check
+
+      - name: Test
+        run: npm test
+
+      # Type-checks the app and the tests, and builds the production bundle.
+      - name: Build
+        run: npm run build
+
+      # The fakes must never reach the production bundle.
+      - name: Check that the bundle has no fake backend
+        run: |
+          if ls dist/assets | grep -q '^fake'; then
+            echo "dist/assets contains a chunk of the fake backend:"
+            ls dist/assets
+            exit 1
+          fi
+
+  image:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      RELEASE: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Sign in to the GitHub Container Registry
+        if: env.RELEASE == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # The image tag is the version number of the git tag without the v.
+      - name: Derive the image tags
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/szoftarch-chess-platform/frontend
+          tags: type=semver,pattern={{version}}
+
+      # Without a version tag the image is only built, for the platform of the runner.
+      - name: Build the image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: ${{ env.RELEASE == 'true' && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
+          push: ${{ env.RELEASE == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
