@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { App } from '../App';
+import { createBackend as createRealBackend } from '../api/real';
 import { renderWithProviders } from '../test/render';
 
 describe('the badge of the fake mode', () => {
@@ -13,7 +14,7 @@ describe('the badge of the fake mode', () => {
     renderWithProviders(<App />, {
       route: '/login',
       user: null,
-      backend: { kind: 'real' },
+      backend: createRealBackend(),
     });
     await screen.findByRole('heading', { level: 1, name: 'Sign in' });
     expect(screen.queryByText('FAKE BACKEND')).not.toBeInTheDocument();

@@ -1,6 +1,14 @@
 import type { Backend } from '../backend';
+import { createFakeAuthApi } from './auth-api';
+import { createFakeGamesApi } from './games-api';
+import { FakeRuntime, type FakeOptions } from './runtime';
 
 /** Answers in the browser from the examples of the contracts, without the services. */
-export function createBackend(): Backend {
-  return { kind: 'fake' };
+export function createBackend(options: FakeOptions = {}): Backend {
+  const runtime = new FakeRuntime(options);
+  return {
+    kind: 'fake',
+    auth: createFakeAuthApi(runtime),
+    games: createFakeGamesApi(runtime),
+  };
 }
