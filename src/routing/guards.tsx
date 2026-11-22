@@ -1,29 +1,61 @@
-import { Center, Spinner } from '@chakra-ui/react';
+import { Button, Center, Spinner, Stack, Text } from '@chakra-ui/react';
+import type { ReactNode } from 'react';
 import { Navigate, Outlet } from 'react-router';
 import { useCurrentUser } from '../auth/current-user';
 
-function Loading() {
-  return (
-    <Center py="16">
-      <Spinner size="lg" aria-label="Loading" />
-    </Center>
-  );
-}
-
 /** The pages for signed-in users. A guest goes to the sign-in page. */
 export function RequireSignedIn() {
-  const { data: user, isPending } = useCurrentUser();
-  if (isPending) {
-    return <Loading />;
-  }
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+  return (
+    <WhenUserKnown>
+      {(signedIn) => (signedIn ? <Outlet /> : <Navigate to="/login" replace />)}
+    </WhenUserKnown>
+  );
 }
 
 /** The pages for guests. A signed-in user goes to the lobby. */
 export function RequireGuest() {
-  const { data: user, isPending } = useCurrentUser();
+  return (
+    <WhenUserKnown>
+      {(signedIn) => (signedIn ? <Navigate to="/" replace /> : <Outlet />)}
+    </WhenUserKnown>
+  );
+}
+
+/**
+ * Renders its children once it is known whether a user is signed in. A failed request is not a
+ * sign-out, because the cookies may still be valid, so it offers a retry instead of a redirect.
+ */
+function WhenUserKnown({
+  children,
+}: {
+  children: (signedIn: boolean) => ReactNode;
+}) {
+  const {
+    data: user,
+    isPending,
+    isError,
+    isFetching,
+    refetch,
+  } = useCurrentUser();
+
   if (isPending) {
-    return <Loading />;
+    return (
+      <Center py="16">
+        <Spinner size="lg" aria-label="Loading" />
+      </Center>
+    );
   }
-  return user ? <Navigate to="/" replace /> : <Outlet />;
+  if (isError) {
+    return (
+      <Center py="16">
+        <Stack align="center" gap="3">
+          <Text>Your account could not be loaded.</Text>
+          <Button loading={isFetching} onClick={() => refetch()}>
+            Retry
+          </Button>
+        </Stack>
+      </Center>
+    );
+  }
+  return children(user !== null);
 }

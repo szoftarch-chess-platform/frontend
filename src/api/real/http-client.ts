@@ -11,9 +11,8 @@ export type HttpClientOptions = {
 };
 
 export type RequestOptions = {
-  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST';
   body?: unknown;
-  signal?: AbortSignal;
 };
 
 export type HttpClient = {
@@ -40,7 +39,6 @@ export function createHttpClient({
       body:
         options.body === undefined ? undefined : JSON.stringify(options.body),
       credentials: 'same-origin',
-      signal: options.signal,
     });
   }
 

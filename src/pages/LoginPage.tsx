@@ -1,42 +1,58 @@
-import { Button, Heading, Link, Stack, Text } from '@chakra-ui/react';
-import { useQueryClient } from '@tanstack/react-query';
-import { Link as RouterLink, useNavigate } from 'react-router';
-import type { CurrentUser } from '../api/types/platform';
-import { currentUserQueryKey } from '../auth/current-user';
-
-// The user of the temporary sign-in, taken from the example of `GET /api/users/me` in the
-// contract.
-const demoUser: CurrentUser = {
-  id: '0193c2b4-7d3e-7c2a-9f1e-3b5a6c7d8e9f',
-  userName: 'alice',
-};
+import { Alert, Button, Heading, Link, Stack, Text } from '@chakra-ui/react';
+import { Link as RouterLink } from 'react-router';
+import { useBackend } from '../api/backend-context';
+import { validateLogin } from '../auth/account-rules';
+import { FormField } from '../auth/FormField';
+import { useAuthForm } from '../auth/useAuthForm';
 
 export function LoginPage() {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-
-  // Temporary until the sign-in form exists (step 4). It writes the user into the cache like
-  // the real sign-in will (FE-ADR-5).
-  const signInAsDemoUser = () => {
-    queryClient.setQueryData(currentUserQueryKey, demoUser);
-    navigate('/', { replace: true });
-  };
+  const { auth } = useBackend();
+  const form = useAuthForm(
+    { userName: '', password: '' },
+    validateLogin,
+    (values) => auth.login(values),
+  );
 
   return (
-    <Stack gap="4" maxW="sm">
-      <Heading as="h1" size="xl">
-        Sign in
-      </Heading>
-      <Text color="fg.muted">The sign-in form comes in step 4.</Text>
-      <Button colorPalette="brand" onClick={signInAsDemoUser}>
-        Sign in as {demoUser.userName}
-      </Button>
-      <Text>
-        No account yet?{' '}
-        <Link asChild colorPalette="brand">
-          <RouterLink to="/register">Register</RouterLink>
-        </Link>
-      </Text>
-    </Stack>
+    <form noValidate onSubmit={form.onSubmit}>
+      <Stack gap="4" maxW="sm">
+        <Heading as="h1" size="xl">
+          Sign in
+        </Heading>
+
+        {form.message && (
+          <Alert.Root status="error">
+            <Alert.Indicator />
+            <Alert.Title>{form.message}</Alert.Title>
+          </Alert.Root>
+        )}
+
+        <FormField
+          label="User name"
+          autoComplete="username"
+          value={form.values.userName}
+          onChange={(value) => form.setValue('userName', value)}
+          errors={form.fieldErrors.userName}
+        />
+        <FormField
+          label="Password"
+          type="password"
+          autoComplete="current-password"
+          value={form.values.password}
+          onChange={(value) => form.setValue('password', value)}
+          errors={form.fieldErrors.password}
+        />
+
+        <Button type="submit" colorPalette="brand" loading={form.isPending}>
+          Sign in
+        </Button>
+        <Text>
+          No account yet?{' '}
+          <Link asChild colorPalette="brand">
+            <RouterLink to="/register">Register</RouterLink>
+          </Link>
+        </Text>
+      </Stack>
+    </form>
   );
 }

@@ -7,26 +7,24 @@ import {
   Link,
   Text,
 } from '@chakra-ui/react';
-import { useQueryClient } from '@tanstack/react-query';
-import { Link as RouterLink, Outlet, useNavigate } from 'react-router';
-import { currentUserQueryKey, useCurrentUser } from '../auth/current-user';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Link as RouterLink, Outlet } from 'react-router';
+import { useBackend } from '../api/backend-context';
+import { setSignedOut, useCurrentUser } from '../auth/current-user';
 import { FakeBackendBadge } from './FakeBackendBadge';
 
 /** The header with the navigation, and the page below it. */
 export function AppLayout() {
   const { data: user } = useCurrentUser();
+  const { auth } = useBackend();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
-  // Temporary sign-out until the auth client exists (step 4). It already clears the whole
-  // cache, as FE-ADR-5 decides for the real sign-out.
-  const signOut = () => {
-    queryClient.setQueryData(currentUserQueryKey, null);
-    queryClient.removeQueries({
-      predicate: (query) => query.queryKey[0] !== currentUserQueryKey[0],
-    });
-    navigate('/login', { replace: true });
-  };
+  // Only the server can revoke the session, because the cookies are HttpOnly. So the user stays
+  // signed in until it has answered, and a failure is shown instead of hidden.
+  const signOut = useMutation({
+    mutationFn: () => auth.logout(),
+    onSuccess: () => setSignedOut(queryClient),
+  });
 
   return (
     <Box minH="100vh" bg="bg.subtle">
@@ -59,8 +57,18 @@ export function AppLayout() {
 
             {user && (
               <HStack gap="3">
+                {signOut.isError && (
+                  <Text color="fg.error" fontSize="sm" role="alert">
+                    Sign-out failed. Try again.
+                  </Text>
+                )}
                 <Text color="fg.muted">{user.userName}</Text>
-                <Button size="sm" variant="outline" onClick={signOut}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  loading={signOut.isPending}
+                  onClick={() => signOut.mutate()}
+                >
                   Sign out
                 </Button>
               </HStack>

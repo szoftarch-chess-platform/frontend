@@ -9,7 +9,7 @@ The logic of the client, such as the changes of the game state, the clock, the r
 ## Decision
 
 - The unit and component tests use Vitest with React Testing Library in jsdom.
-- A setup file adds the matchers of jest-dom, replaces the browser interfaces that jsdom lacks, such as the Web Locks API, `matchMedia` and `ResizeObserver`, and gives a helper that renders a component inside the providers of Chakra, TanStack Query and the router.
+- A setup file adds the matchers of jest-dom, replaces the browser interfaces that the code uses and jsdom lacks, such as the Web Locks API, and gives a helper that renders a component inside the providers of Chakra, TanStack Query and the router.
 - The tests cover the pure logic first, which is the changes of the store, the clock, the HTTP client, the rules of the forms and the page parameter, and then the components.
 - Prettier formats the code with the settings of the game-service, and `eslint-config-prettier` turns off the rules of ESLint that conflict with it.
 - The scripts are `test`, `test:watch`, `test:cov`, `format` and `format:check`, with the names of the game-service.

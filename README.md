@@ -2,7 +2,7 @@
 
 Web frontend of the online chess platform. Its decisions are listed in [docs/](docs/README.md).
 
-> Status: the pages are placeholders. The sign-in page has a temporary button that signs in as a demo user.
+> Status: registration, sign-in and sign-out work. The lobby, the game and the history are placeholders.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ To work without the services, start the fake mode:
 npm run dev:fake
 ```
 
-The app runs at http://localhost:5173 and answers every request in the browser. It needs neither the infra repo nor Docker, and the header shows a FAKE BACKEND badge.
+The app runs at http://localhost:5173 and answers every request in the browser. It needs neither the infra repo nor Docker, and the header shows a FAKE BACKEND badge. Sign in as `alice` or `bob` with the password `correct horse battery`, or register a new user. A reload starts the fake mode from the beginning.
 
 To work against the services, start the infra compose first, then:
 

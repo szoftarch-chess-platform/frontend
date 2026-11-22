@@ -22,15 +22,14 @@
 - The open question of [FE-ADR-5](adr/state-management.md) on when the socket connects.
 - The open question of [FE-ADR-6](adr/chessboard.md) on the choice of piece for a promotion.
 - Whether the game page shows the moves of the game, and in which form, because ADR-8 shows no SAN in the first version.
-- The texts that the users see for the error codes of the game-service and for the errors of the REST API, because the `message` of the contracts is only for the logs.
+- The texts that the users see for the error codes of the game-service, because the `message` of its acknowledgements is only for the logs, and for the errors of the REST API that name no field, such as a wrong password, too many attempts or an unexpected error. The sign-in and registration forms use provisional texts until the team decides.
 - The format of the clocks, for example whether tenths of a second appear when the time runs low, and whether a clock that runs low is marked.
 
 ## Next steps
 
-- Build registration and sign-in with the rules of ADR-4 checked in the forms, the field errors of the 400 and 409 answers, the signed-in user from `GET /api/users/me`, and sign-out that closes the Socket.IO connection.
-- Write the types of the contract `game-service.asyncapi.yaml` (FE-ADR-10), and build the connection to `/ws/game` with the refresh after `connect_error` and `getState` after every connect (ADR-4).
+- Write the types of the contract `game-service.asyncapi.yaml` (FE-ADR-10), and build the connection to `/ws/game` with the refresh after `connect_error`, `getState` after every connect, and its closing on sign-out (ADR-4).
 - Fake the Socket.IO protocol from the examples of the contract `game-service.asyncapi.yaml` (FE-ADR-9), together with the connection to `/ws/game`.
 - Build the lobby with joining and leaving the queue and starting a game against the bot.
-- Build the game page with the legal moves of chess.js highlighted (ADR-9), the moves sent with acknowledgements, the piece put back after a refusal, the clocks counted down locally (ADR-8), resignation, and the result with its reason (ADR-10).
+- Build the game page with the legal moves of chess.js highlighted (ADR-9), the moves sent with acknowledgements, the piece put back after a refusal, the clocks counted down locally (ADR-8), resignation, and the result with its reason (ADR-10), and add the colors of the board, the highlights and the clocks to the theme as semantic tokens (FE-ADR-6, FE-ADR-7).
 - Build the history with paging, and a finished game replayed move by move with chess.js (F-6).
 - Test the flows end to end with Playwright in Chrome, Firefox and Edge (FE-ADR-8, NF-7).

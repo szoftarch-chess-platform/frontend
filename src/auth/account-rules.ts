@@ -10,11 +10,11 @@ import type {
 const USER_NAME_PATTERN = /^[A-Za-z0-9_-]+$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+$/;
 
-export const USER_NAME_MIN = 3;
-export const USER_NAME_MAX = 20;
-export const EMAIL_MAX = 254;
-export const PASSWORD_MIN = 8;
-export const PASSWORD_MAX = 128;
+const USER_NAME_MIN = 3;
+const USER_NAME_MAX = 20;
+const EMAIL_MAX = 254;
+const PASSWORD_MIN = 8;
+const PASSWORD_MAX = 128;
 
 export function codePointLength(text: string): number {
   return [...text].length;
