@@ -2,10 +2,10 @@ import type { GameSocket } from '../api/game-socket';
 import {
   applyQueueJoined,
   applyQueueLeft,
-  applyState,
   type GameStore,
   useGameStore,
 } from './store';
+import { syncState } from './sync';
 
 export type LobbyAction = 'joinQueue' | 'leaveQueue' | 'startBotGame';
 
@@ -29,12 +29,8 @@ export async function runLobbyAction(
     useGameStore.setState(onAccepted[action]);
     return;
   }
-  if (otherTabCodes.includes(answer.error.code)) {
-    const state = await socket.emitWithAck('getState', {});
-    if (state.ok) {
-      useGameStore.setState((store) => applyState(store, state));
-      return;
-    }
+  if (otherTabCodes.includes(answer.error.code) && (await syncState(socket))) {
+    return;
   }
   throw new Error(answer.error.message);
 }

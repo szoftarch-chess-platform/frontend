@@ -51,7 +51,30 @@ export class InMemoryLockManager {
   }
 }
 
+/**
+ * jsdom has no layout, so the board cannot measure its squares for an animation. The tests run
+ * as for a user who asks for reduced motion.
+ */
+function reducedMotionMatchMedia(query: string): MediaQueryList {
+  return {
+    matches: query.includes('prefers-reduced-motion: reduce'),
+    media: query,
+    onchange: null,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+    addListener: () => undefined,
+    removeListener: () => undefined,
+    dispatchEvent: () => false,
+  };
+}
+
 export function installBrowserStandIns(): void {
+  if (typeof window.matchMedia !== 'function') {
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: reducedMotionMatchMedia,
+    });
+  }
   if (!('locks' in navigator)) {
     Object.defineProperty(navigator, 'locks', {
       configurable: true,

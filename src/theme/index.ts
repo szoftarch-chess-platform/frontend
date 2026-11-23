@@ -36,12 +36,33 @@ const config = defineConfig({
           emphasized: { value: '{colors.brand.200}' },
           focusRing: { value: '{colors.brand.500}' },
         },
+        // A palette for actions that cannot be undone, such as resigning.
+        danger: {
+          solid: { value: '{colors.red.600}' },
+          contrast: { value: 'white' },
+          fg: { value: '{colors.red.700}' },
+          muted: { value: '{colors.red.100}' },
+          subtle: { value: '{colors.red.50}' },
+          emphasized: { value: '{colors.red.200}' },
+          focusRing: { value: '{colors.red.500}' },
+        },
         board: {
           light: { value: '#dde8cf' },
           dark: { value: '{colors.brand.700}' },
         },
         highlight: {
           lastMove: { value: 'rgba(214, 222, 96, 0.7)' },
+          selected: { value: 'rgba(214, 222, 96, 0.9)' },
+          legalMove: { value: 'rgba(214, 222, 96, 0.95)' },
+          legalMoveRing: { value: 'rgba(8, 22, 8, 0.55)' },
+          check: { value: 'rgba(220, 38, 38, 0.85)' },
+        },
+        clock: {
+          low: { value: '{colors.red.600}' },
+          running: {
+            bg: { value: '{colors.brand.700}' },
+            fg: { value: 'white' },
+          },
         },
         // The band at the top of the lobby.
         hero: {

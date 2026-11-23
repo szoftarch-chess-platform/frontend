@@ -14,6 +14,13 @@ import { useBackend } from '../api/backend-context';
 import type { GameSummary } from '../api/types/platform';
 import type { Uuid } from '../api/types/shared';
 import { useCurrentUser } from '../auth/current-user';
+import {
+  colorOf,
+  OUTCOME_TEXT,
+  OUTCOME_TOKEN,
+  outcomeFor,
+  reasonText,
+} from '../game/outcome';
 
 const RECENT_COUNT = 3;
 
@@ -61,9 +68,10 @@ export function RecentGames() {
 }
 
 function GameCard({ game, userId }: { game: GameSummary; userId: Uuid }) {
-  const color = isUser(game.white, userId) ? 'white' : 'black';
+  const color = colorOf(game, userId);
   const opponent = color === 'white' ? game.black : game.white;
-  const outcome = outcomeFor(game, color);
+  const outcome = outcomeFor(game.result, color);
+  const reason = reasonText(game.reason);
 
   return (
     <Link
@@ -97,59 +105,11 @@ function GameCard({ game, userId }: { game: GameSummary; userId: Uuid }) {
             <Text fontWeight="semibold">vs {opponent.name}</Text>
             <Text fontSize="sm" color="fg.muted">
               With {color}
-              {REASON_TEXT[game.reason] && `, ${REASON_TEXT[game.reason]}`}
+              {reason && `, ${reason}`}
             </Text>
           </Stack>
         </Box>
       </RouterLink>
     </Link>
   );
-}
-
-type Outcome = 'won' | 'lost' | 'draw' | 'aborted' | 'unknown';
-
-const OUTCOME_TEXT: Record<Outcome, string> = {
-  won: 'Won',
-  lost: 'Lost',
-  draw: 'Draw',
-  aborted: 'Aborted',
-  unknown: 'Finished',
-};
-
-const OUTCOME_TOKEN: Record<Outcome, 'won' | 'lost' | 'other'> = {
-  won: 'won',
-  lost: 'lost',
-  draw: 'other',
-  aborted: 'other',
-  unknown: 'other',
-};
-
-const REASON_TEXT: Record<string, string> = {
-  checkmate: 'by checkmate',
-  resignation: 'by resignation',
-  timeout: 'on time',
-  stalemate: 'by stalemate',
-  threefoldRepetition: 'by repetition',
-  fiftyMoveRule: 'by the fifty-move rule',
-  insufficientMaterial: 'by insufficient material',
-  engineFailure: 'because the computer failed',
-};
-
-function outcomeFor(game: GameSummary, color: 'white' | 'black'): Outcome {
-  switch (game.result) {
-    case 'whiteWon':
-      return color === 'white' ? 'won' : 'lost';
-    case 'blackWon':
-      return color === 'black' ? 'won' : 'lost';
-    case 'draw':
-      return 'draw';
-    case 'aborted':
-      return 'aborted';
-    default:
-      return 'unknown';
-  }
-}
-
-function isUser(player: GameSummary['white'], userId: Uuid): boolean {
-  return player.kind === 'user' && player.userId === userId;
 }

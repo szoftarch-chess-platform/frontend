@@ -9,7 +9,7 @@ export function createFakeGamesApi(runtime: FakeRuntime): GamesApi {
     list: (page, pageSize) =>
       runtime.answer((state) => {
         const userId = signedInUserId(state);
-        const own = games
+        const own = [...games, ...state.finished]
           .filter((game) => playedBy(game, userId))
           .sort(newestFirst);
         const start = (page - 1) * pageSize;
@@ -24,7 +24,7 @@ export function createFakeGamesApi(runtime: FakeRuntime): GamesApi {
     get: (gameId) =>
       runtime.answer((state) => {
         const userId = signedInUserId(state);
-        const game = games.find((g) => g.id === gameId);
+        const game = [...games, ...state.finished].find((g) => g.id === gameId);
         if (!game || !playedBy(game, userId)) {
           throw new ApiError(404, {
             title: 'Not Found',

@@ -37,7 +37,7 @@ describe('the lobby', () => {
     await openLobby();
     await userEvent.click(await button('Start the game'));
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Game' }),
+      await screen.findByRole('heading', { level: 1, name: /^Game against/ }),
     ).toBeInTheDocument();
   });
 
@@ -48,7 +48,7 @@ describe('the lobby', () => {
 
     renderWithProviders(<App />, { route: '/', backend });
     expect(
-      await screen.findByRole('heading', { level: 1, name: 'Game' }),
+      await screen.findByRole('heading', { level: 1, name: /^Game against/ }),
     ).toBeInTheDocument();
   });
 

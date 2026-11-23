@@ -2,7 +2,7 @@
 
 Web frontend of the online chess platform. Its decisions are listed in [docs/](docs/README.md).
 
-> Status: registration, sign-in and sign-out work, and the lobby finds an opponent or starts a game against the computer. The game and the history are placeholders.
+> Status: registration, sign-in and sign-out work, the lobby finds an opponent or starts a game against the computer, and the game page plays the game with clocks, promotion and resignation. The history is a placeholder.
 
 ## Requirements
 

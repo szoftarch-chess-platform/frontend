@@ -1,4 +1,5 @@
 import type { GameState } from '../types/game';
+import type { GameDetails } from '../types/platform';
 import { exampleUsers } from './examples';
 
 export type FakeUser = {
@@ -13,12 +14,15 @@ export type FakeState = {
   signedInUserId?: string;
   queue: string[];
   games: GameState[];
+  finished: GameDetails[];
 };
 
 export type FakeOptions = {
   delayMs?: number;
   /** How long the queue waits before a fake opponent joins it. */
   opponentDelayMs?: number;
+  /** How long the bot and the fake opponent think about a move. */
+  moveDelayMs?: number;
 };
 
 /** The in-memory state of the fakes. Every answer is a copy, as from a server. */
@@ -27,13 +31,20 @@ export class FakeRuntime {
     users: exampleUsers.map((user) => ({ ...user })),
     queue: [],
     games: [],
+    finished: [],
   };
   readonly opponentDelayMs: number;
+  readonly moveDelayMs: number;
   private readonly delayMs: number;
 
-  constructor({ delayMs = 300, opponentDelayMs = 3000 }: FakeOptions = {}) {
+  constructor({
+    delayMs = 300,
+    opponentDelayMs = 3000,
+    moveDelayMs = 1000,
+  }: FakeOptions = {}) {
     this.delayMs = delayMs;
     this.opponentDelayMs = opponentDelayMs;
+    this.moveDelayMs = moveDelayMs;
   }
 
   async answer<T>(handle: (state: FakeState) => T): Promise<T> {
