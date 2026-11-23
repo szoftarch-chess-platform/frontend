@@ -27,6 +27,7 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
   - After every connect the client asks `getState` and puts the answer into the store. If the game-service refuses it, the client asks again every 2 seconds while the connection stays open.
   - The browser does not see why a handshake failed, so after `connect_error` the client refreshes the tokens with the same function as the HTTP client, while Socket.IO keeps retrying. After a successful refresh it does not refresh again until a connect succeeds. A refresh that failed is tried again at the next `connect_error`, and a refresh answered with 401 signs the user out. When the game-service closes the connection itself, the client connects again.
   - The lobby sends `joinQueue`, `leaveQueue` and `startBotGame` with their controls disabled until `getState` has answered. A refusal with `alreadyInQueue`, `alreadyInGame` or `notInQueue` means that another tab acted first, so the lobby asks `getState` and follows it without a message. Any other refusal shows one general message.
+  - The game page follows the same rule for `makeMove` and `resign`. A refusal with `notYourTurn`, `illegalMove` or `gameNotFound` means that the view of the client is old, so the piece goes back without a message and the client asks `getState`. Any other refusal puts the piece back and shows one general message.
   - Until `getState` has answered, the lobby and the game page show a banner, which says that the connection is lost after a disconnect.
 
 ## Rationale
@@ -39,6 +40,7 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
 - The game-service keeps the user in the queue and in the game whether a socket is open or not, and the clock runs on. With the socket open on every page, no event is missed while the user looks at the history.
 - The access token lives 15 minutes, so a reconnect after a longer connection often fails until the tokens are refreshed. After a successful refresh the client waits for a connect, so a game-service that is down does not cause a refresh at every retry.
 - The game-service sends no event when another tab joins or leaves the queue, so a refusal caused by another tab is answered by the state of the server instead of an error that the user cannot act on.
+- The board checks every move with chess.js before it is sent, so a refusal of a move comes from a race, such as another tab or the end of the game on time, which the user cannot act on.
 - A refused `getState` is most likely a passing failure of the game-service, and a retry needs no text for the users, whose wording is still open.
 - The Web Locks API is supported by Chrome, Firefox and Edge, which NF-7 names, and it is the way that the identity providers send one refresh across tabs, as ADR-4 describes.
 

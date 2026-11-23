@@ -30,7 +30,10 @@ describe('the game connection', () => {
       { ok: true, queued: true },
       { ok: true, queued: false, game },
     ]);
-    const stop = startGameConnection(socket, () => {});
+    const stop = startGameConnection(socket, {
+      onGameStarted() {},
+      onGameEnded() {},
+    });
     expect(socket.connect).toHaveBeenCalled();
 
     await emit('connect');
@@ -53,7 +56,10 @@ describe('the game connection', () => {
 
   it('disconnects and forgets the game when it stops', async () => {
     const { socket, emit } = stubSocket([{ ok: true, queued: false, game }]);
-    const stop = startGameConnection(socket, () => {});
+    const stop = startGameConnection(socket, {
+      onGameStarted() {},
+      onGameEnded() {},
+    });
     await emit('connect');
 
     stop();
@@ -71,7 +77,10 @@ describe('the game connection', () => {
       error: { code: 'internalError', message: 'Redis is down.' },
     };
     const { socket, emit } = stubSocket([refused, { ok: true, queued: true }]);
-    const stop = startGameConnection(socket, () => {});
+    const stop = startGameConnection(socket, {
+      onGameStarted() {},
+      onGameEnded() {},
+    });
 
     void emit('connect');
     await vi.advanceTimersByTimeAsync(0);

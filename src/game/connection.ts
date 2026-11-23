@@ -1,6 +1,8 @@
 import type { GameSocket } from '../api/game-socket';
 import {
+  applyGameEnded,
   applyGameStarted,
+  applyMoveMade,
   applyState,
   initialGameStore,
   useGameStore,
@@ -8,10 +10,15 @@ import {
 
 export const STATE_RETRY_MS = 2000;
 
+type GameEvents = {
+  onGameStarted: () => void;
+  onGameEnded: () => void;
+};
+
 /** Connects the socket and keeps the store in step with it. Returns the function that stops it. */
 export function startGameConnection(
   socket: GameSocket,
-  onGameStarted: () => void,
+  { onGameStarted, onGameEnded }: GameEvents,
 ): () => void {
   let stopped = false;
   let retry: ReturnType<typeof setTimeout> | undefined;
@@ -28,7 +35,9 @@ export function startGameConnection(
       return;
     }
     if (answer.ok) {
-      useGameStore.setState((store) => applyState(store, answer));
+      useGameStore.setState((store) =>
+        applyState(store, answer, performance.now()),
+      );
     } else {
       retry = setTimeout(askState, STATE_RETRY_MS);
     }
@@ -39,8 +48,21 @@ export function startGameConnection(
     void askState();
   });
   const offGameStarted = socket.on('gameStarted', ({ game }) => {
-    useGameStore.setState((store) => applyGameStarted(store, game));
+    useGameStore.setState((store) =>
+      applyGameStarted(store, game, performance.now()),
+    );
     onGameStarted();
+  });
+  const offMoveMade = socket.on('moveMade', (event) => {
+    useGameStore.setState((store) =>
+      applyMoveMade(store, event, performance.now()),
+    );
+  });
+  const offGameEnded = socket.on('gameEnded', (event) => {
+    useGameStore.setState((store) =>
+      applyGameEnded(store, event, performance.now()),
+    );
+    onGameEnded();
   });
   const offDisconnect = socket.on('disconnect', () => {
     clearTimeout(retry);
@@ -53,6 +75,8 @@ export function startGameConnection(
     clearTimeout(retry);
     offConnect();
     offGameStarted();
+    offMoveMade();
+    offGameEnded();
     offDisconnect();
     socket.disconnect();
     useGameStore.setState(initialGameStore, true);

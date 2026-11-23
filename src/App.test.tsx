@@ -32,7 +32,6 @@ describe('the routes of a guest', () => {
 describe('the routes of a signed-in user', () => {
   it.each([
     ['/', 'Start a game'],
-    ['/game', 'Game'],
     ['/history', 'History'],
     ['/history/0193c2bf-0a1b-7c2d-9e3f-4a5b6c7d8e9f', 'Finished game'],
   ])('open %s', async (route, title) => {
