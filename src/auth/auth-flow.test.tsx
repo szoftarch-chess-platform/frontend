@@ -14,6 +14,13 @@ function heading(name: string) {
   return screen.findByRole('heading', { level: 1, name });
 }
 
+/** A rule under a field, by its whole text with the hidden state, such as `Met: 8 to 128 characters`. */
+function rule(text: string) {
+  return screen.getByText(
+    (_, element) => element?.tagName === 'LI' && element.textContent === text,
+  );
+}
+
 async function fill(label: string, value: string) {
   await userEvent.type(screen.getByLabelText(label), value);
 }
@@ -113,16 +120,33 @@ describe('registration', () => {
     await fill('Password', 'short');
     await userEvent.click(screen.getByRole('button', { name: 'Register' }));
 
+    expect(rule('Not met: 3 to 20 characters')).toBeInTheDocument();
     expect(
-      screen.getByText('The user name must be 3 to 20 characters long.'),
+      rule('Not met: An address such as name@example.com'),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('The email address is not valid.'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('The password must be at least 8 characters long.'),
-    ).toBeInTheDocument();
+    expect(rule('Not met: 8 to 128 characters')).toBeInTheDocument();
     expect(register).not.toHaveBeenCalled();
+  });
+
+  it('lists the rules of a field while typing and keeps only the broken ones', async () => {
+    renderWithProviders(<App />, { route: '/register' });
+    await heading('Register');
+    expect(screen.queryByText(/3 to 20 characters/)).not.toBeInTheDocument();
+
+    await fill('User name', 'al');
+    expect(
+      rule('Met: Only English letters, digits, _ and -'),
+    ).toBeInTheDocument();
+    expect(rule('Not met: 3 to 20 characters')).toBeInTheDocument();
+
+    await userEvent.tab();
+    expect(rule('Not met: 3 to 20 characters')).toBeInTheDocument();
+    expect(screen.queryByText(/Only English letters/)).not.toBeInTheDocument();
+
+    await fill('User name', 'ice');
+    expect(rule('Met: 3 to 20 characters')).toBeInTheDocument();
+    await userEvent.tab();
+    expect(screen.queryByText(/3 to 20 characters/)).not.toBeInTheDocument();
   });
 
   it('shows a taken user name under its field', async () => {
