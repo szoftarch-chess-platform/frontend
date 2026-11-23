@@ -1,20 +1,29 @@
-import { Box } from '@chakra-ui/react';
-import { Chess } from 'chess.js';
+import { Box, Stack, Text } from '@chakra-ui/react';
+import { useState } from 'react';
 import { ChessBoard } from '../game/ChessBoard';
+import { positionOf, randomOpening } from './openings';
 
-const opening = new Chess();
-['e4', 'e5', 'Nf3', 'Nf6', 'Bc4'].forEach((move) => opening.move(move));
-
-/** A board in a real opening position, as the image of the lobby. */
+/**
+ * A board in the position of a well-known opening with its name under it, as the image of the
+ * lobby, the sign-in and the registration. Every visit picks another opening at random.
+ */
 export function HeroBoard() {
+  const [opening] = useState(randomOpening);
+  const { fen, lastMove } = positionOf(opening);
+
   return (
-    <Box aria-hidden>
-      <ChessBoard
-        id="lobby-board"
-        fen={opening.fen()}
-        size="26rem"
-        lastMove="f1c4"
-      />
-    </Box>
+    <Stack as="figure" gap="3" align="center">
+      <Box aria-hidden>
+        <ChessBoard
+          id="lobby-board"
+          fen={fen}
+          size="26rem"
+          lastMove={lastMove}
+        />
+      </Box>
+      <Text as="figcaption" fontSize="sm" opacity="0.8">
+        {opening.name}
+      </Text>
+    </Stack>
   );
 }
