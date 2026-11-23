@@ -1,4 +1,4 @@
-// Types of the contract platform-service.openapi.yaml 2.0.0 in the infra repo.
+// Types of the contract platform-service.openapi.yaml 2.1.0 in the infra repo.
 // Check this file when the info.version of the contract changes.
 
 import type {
