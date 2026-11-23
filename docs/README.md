@@ -26,5 +26,4 @@
 ## Next steps
 
 - Play the lobby and the game page against the game-service of `dev` through the gateway, which implements the contract `game-service.asyncapi.yaml` now.
-- Build the history with paging (F-6). Its games open the replay at `/history/:gameId`, which exists.
 - Test the flows end to end with Playwright in Chrome, Firefox and Edge (FE-ADR-8, NF-7).

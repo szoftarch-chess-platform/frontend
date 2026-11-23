@@ -1,6 +1,5 @@
 import {
   Alert,
-  Badge,
   Box,
   Button,
   Grid,
@@ -20,13 +19,8 @@ import { useBackend } from '../api/backend-context';
 import type { GameDetails } from '../api/types/platform';
 import { useCurrentUser } from '../auth/current-user';
 import { ChessBoard } from '../game/ChessBoard';
-import {
-  colorOf,
-  OUTCOME_TEXT,
-  OUTCOME_TOKEN,
-  outcomeFor,
-  reasonText,
-} from '../game/outcome';
+import { colorOf, outcomeFor, reasonText } from '../game/outcome';
+import { OutcomeBadge } from '../game/OutcomeBadge';
 import { checkedKing, positionsOf } from '../game/rules';
 import { HeroBand } from '../layout/HeroBand';
 
@@ -136,13 +130,7 @@ function Replay({ game }: { game: GameDetails }) {
             Game against {opponent.name}
           </Heading>
           <HStack gap="3" wrap="wrap">
-            <Badge
-              size="lg"
-              bg={`outcome.${OUTCOME_TOKEN[outcome]}.bg`}
-              color={`outcome.${OUTCOME_TOKEN[outcome]}.fg`}
-            >
-              {OUTCOME_TEXT[outcome]}
-            </Badge>
+            <OutcomeBadge outcome={outcome} />
             <Text>{reasonText(game.reason)}</Text>
           </HStack>
           <Text color="hero.fg" opacity="0.8">

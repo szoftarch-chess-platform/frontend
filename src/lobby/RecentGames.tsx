@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Heading,
   HStack,
@@ -14,13 +13,8 @@ import { useBackend } from '../api/backend-context';
 import type { GameSummary } from '../api/types/platform';
 import type { Uuid } from '../api/types/shared';
 import { useCurrentUser } from '../auth/current-user';
-import {
-  colorOf,
-  OUTCOME_TEXT,
-  OUTCOME_TOKEN,
-  outcomeFor,
-  reasonText,
-} from '../game/outcome';
+import { colorOf, outcomeFor, reasonText } from '../game/outcome';
+import { OutcomeBadge } from '../game/OutcomeBadge';
 
 const RECENT_COUNT = 3;
 
@@ -91,13 +85,7 @@ function GameCard({ game, userId }: { game: GameSummary; userId: Uuid }) {
         >
           <Stack gap="2">
             <HStack justify="space-between">
-              <Badge
-                size="lg"
-                bg={`outcome.${OUTCOME_TOKEN[outcome]}.bg`}
-                color={`outcome.${OUTCOME_TOKEN[outcome]}.fg`}
-              >
-                {OUTCOME_TEXT[outcome]}
-              </Badge>
+              <OutcomeBadge outcome={outcome} />
               <Text fontSize="sm" color="fg.muted">
                 {dateFormat.format(new Date(game.endedAt))}
               </Text>
