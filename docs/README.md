@@ -1,6 +1,7 @@
 # frontend documentation
 
 - System documentation: the `docs/` folder of the infra repo
+- Changes that the frontend asks of the other repos: [requests-to-other-repos.md](requests-to-other-repos.md)
 
 ## ADRs
 
@@ -20,7 +21,7 @@
 ## Open questions
 
 - The texts that the users see for the error codes of the game-service, because the `message` of its acknowledgements is only for the logs, and for the errors of the REST API that name no field, such as a wrong password, too many attempts or an unexpected error. The sign-in and registration forms use provisional texts until the team decides.
-- Whether the lobby shows how long the user has been waiting in the queue. The contract `game-service.asyncapi.yaml` sends no time of joining, so a count of the client would start again after a reload. The team decides it together with the contract.
+- Whether the lobby shows how long the user has been waiting in the queue. The contract `game-service.asyncapi.yaml` sends no time of joining, so a count of the client would start again after a reload. The team decides it together with the contract, as [requests-to-other-repos.md](requests-to-other-repos.md) describes.
 
 ## Next steps
 
