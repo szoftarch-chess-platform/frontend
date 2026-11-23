@@ -48,8 +48,9 @@ export default defineConfig(({ command, mode }) => {
         cert: readTlsFile('gateway.crt'),
         key: readTlsFile('gateway.key'),
       },
-      // The proxy keeps the Host header, because the gateway compares it
-      // with the Origin header of a WebSocket handshake.
+      // The proxy keeps the Host and the Sec-Fetch-Site headers, because the
+      // gateway uses them to check the origin of a WebSocket handshake and of
+      // a request that changes something.
       proxy: {
         '/api': { target: gateway },
         '/ws': { target: gateway, ws: true },
