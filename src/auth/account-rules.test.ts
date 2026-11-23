@@ -19,9 +19,9 @@ describe('validateRegistration', () => {
   it.each(['al', 'a'.repeat(21), ''])(
     'refuses the user name %j by its length',
     (userName) => {
-      expect(validateRegistration({ ...valid, userName }).userName).toEqual([
-        'The user name must be 3 to 20 characters long.',
-      ]);
+      expect(validateRegistration({ ...valid, userName }).userName).toContain(
+        '3 to 20 characters',
+      );
     },
   );
 
@@ -29,7 +29,7 @@ describe('validateRegistration', () => {
     'refuses the user name %j by its characters',
     (userName) => {
       expect(validateRegistration({ ...valid, userName }).userName).toContain(
-        'The user name may contain only English letters, digits, _ and -.',
+        'Only English letters, digits, _ and -',
       );
     },
   );
@@ -41,17 +41,14 @@ describe('validateRegistration', () => {
     },
   );
 
-  it.each([
-    ['', 'The email address is required.'],
-    ['alice', 'The email address is not valid.'],
-    ['alice @example.com', 'The email address is not valid.'],
-    [
-      `${'a'.repeat(250)}@x.io`,
-      'The email address must be at most 254 characters long.',
-    ],
-  ])('refuses the email %j', (email, message) => {
-    expect(validateRegistration({ ...valid, email }).email).toEqual([message]);
-  });
+  it.each(['', 'alice', 'alice @example.com', `${'a'.repeat(250)}@x.io`])(
+    'refuses the email %j',
+    (email) => {
+      expect(validateRegistration({ ...valid, email }).email).toEqual([
+        'An address such as name@example.com',
+      ]);
+    },
+  );
 
   it('counts the code points of an email address, as the server does', () => {
     // 254 code points, but 2 more UTF-16 units.
@@ -60,19 +57,19 @@ describe('validateRegistration', () => {
     expect(validateRegistration({ ...valid, email: atTheLimit })).toEqual({});
     expect(
       validateRegistration({ ...valid, email: `a${atTheLimit}` }).email,
-    ).toEqual(['The email address must be at most 254 characters long.']);
+    ).toEqual(['An address such as name@example.com']);
   });
 
   it('refuses a password shorter than 8 code points', () => {
     expect(
       validateRegistration({ ...valid, password: 'short' }).password,
-    ).toEqual(['The password must be at least 8 characters long.']);
+    ).toEqual(['8 to 128 characters']);
   });
 
   it('refuses a password longer than 128 code points', () => {
     expect(
       validateRegistration({ ...valid, password: 'x'.repeat(129) }).password,
-    ).toEqual(['The password must be at most 128 characters long.']);
+    ).toEqual(['8 to 128 characters']);
   });
 
   it('counts an emoji as one character, as the server does', () => {
@@ -80,7 +77,7 @@ describe('validateRegistration', () => {
     const password = '😀'.repeat(7);
     expect(password).toHaveLength(14);
     expect(validateRegistration({ ...valid, password }).password).toEqual([
-      'The password must be at least 8 characters long.',
+      '8 to 128 characters',
     ]);
     expect(
       validateRegistration({ ...valid, password: '😀'.repeat(8) }),

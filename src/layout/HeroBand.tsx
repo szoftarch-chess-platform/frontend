@@ -3,22 +3,33 @@ import type { ReactNode } from 'react';
 
 /**
  * The deep green band at the top of a page, with a board next to its content. With `asideWidth`
- * the content keeps that width, and the board and the content stand in the middle.
+ * the content keeps that width, and the board and the content stand in the middle. `overlap` adds
+ * that much room at the bottom of the band, for content below that pulls itself up over the band.
  */
 export function HeroBand({
   board,
   asideWidth,
+  overlap,
   children,
 }: {
   board: ReactNode;
   asideWidth?: string;
+  overlap?: string;
   children: ReactNode;
 }) {
   return (
     <Box
       mx="calc(50% - 50vw)"
       mt="-10"
-      py={{ base: '10', lg: '14' }}
+      pt={{ base: '10', lg: '14' }}
+      pb={
+        overlap
+          ? {
+              base: `calc(2.5rem + ${overlap})`,
+              lg: `calc(3.5rem + ${overlap})`,
+            }
+          : { base: '10', lg: '14' }
+      }
       bg="hero.bg"
       color="hero.fg"
     >

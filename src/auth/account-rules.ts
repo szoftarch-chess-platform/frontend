@@ -21,50 +21,59 @@ export function codePointLength(text: string): number {
   return [...text].length;
 }
 
-export function validateRegistration(request: RegisterRequest): FieldErrors {
-  const errors: FieldErrors = {};
-  const add = (field: string, message: string) => {
-    (errors[field] ??= []).push(message);
+/** One rule of a field, with the text that the form shows for it before and while typing. */
+export type Requirement = {
+  text: string;
+  met: (value: string) => boolean;
+};
+
+/**
+ * The rules of the registration by field. The form lists them under the fields, and the check
+ * before sending refuses a field by the texts of the rules that it breaks.
+ */
+export const REGISTRATION_RULES: Record<keyof RegisterRequest, Requirement[]> =
+  {
+    userName: [
+      {
+        text: `${USER_NAME_MIN} to ${USER_NAME_MAX} characters`,
+        met: (value) =>
+          value.length >= USER_NAME_MIN && value.length <= USER_NAME_MAX,
+      },
+      {
+        text: 'Only English letters, digits, _ and -',
+        met: (value) => USER_NAME_PATTERN.test(value),
+      },
+    ],
+    email: [
+      {
+        text: 'An address such as name@example.com',
+        met: (value) =>
+          codePointLength(value) <= EMAIL_MAX && EMAIL_PATTERN.test(value),
+      },
+    ],
+    password: [
+      {
+        text: `${PASSWORD_MIN} to ${PASSWORD_MAX} characters`,
+        met: (value) => {
+          const length = codePointLength(value);
+          return length >= PASSWORD_MIN && length <= PASSWORD_MAX;
+        },
+      },
+    ],
   };
 
-  const { userName, email, password } = request;
-  if (userName.length < USER_NAME_MIN || userName.length > USER_NAME_MAX) {
-    add(
-      'userName',
-      `The user name must be ${USER_NAME_MIN} to ${USER_NAME_MAX} characters long.`,
-    );
+export function validateRegistration(request: RegisterRequest): FieldErrors {
+  const errors: FieldErrors = {};
+  for (const field of Object.keys(REGISTRATION_RULES) as Array<
+    keyof RegisterRequest
+  >) {
+    const broken = REGISTRATION_RULES[field]
+      .filter((rule) => !rule.met(request[field]))
+      .map((rule) => rule.text);
+    if (broken.length > 0) {
+      errors[field] = broken;
+    }
   }
-  if (userName !== '' && !USER_NAME_PATTERN.test(userName)) {
-    add(
-      'userName',
-      'The user name may contain only English letters, digits, _ and -.',
-    );
-  }
-
-  if (email === '') {
-    add('email', 'The email address is required.');
-  } else if (codePointLength(email) > EMAIL_MAX) {
-    add(
-      'email',
-      `The email address must be at most ${EMAIL_MAX} characters long.`,
-    );
-  } else if (!EMAIL_PATTERN.test(email)) {
-    add('email', 'The email address is not valid.');
-  }
-
-  const passwordLength = codePointLength(password);
-  if (passwordLength < PASSWORD_MIN) {
-    add(
-      'password',
-      `The password must be at least ${PASSWORD_MIN} characters long.`,
-    );
-  } else if (passwordLength > PASSWORD_MAX) {
-    add(
-      'password',
-      `The password must be at most ${PASSWORD_MAX} characters long.`,
-    );
-  }
-
   return errors;
 }
 

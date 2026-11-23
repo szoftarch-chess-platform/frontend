@@ -82,6 +82,16 @@ Each request says why the frontend needs it, what to change, and which frontend 
 - **Change:** tell the client when the game is stored, for example with an event of the game-service after the platform-service has stored it. It needs a new event path in ADR-6 and the contracts.
 - **Frontend code this removes:** the `justEnded` state and the 404 retry of `src/pages/GameReplayPage.tsx`. The game page offers the replay once the game is stored, and the signal refreshes the recent games and the history.
 
+### Statistics and filters of the history (team)
+
+- **Why:** the history page should show at its top how many games the user won, lost and drew, how many ended by resignation, and how many were against the bot or against a person, and let the user filter the list by these. `GET /api/games` only takes `page` and `pageSize`, so the frontend sees one page at a time. The platform-service keeps every game (PS-ADR-13), so counting in the client would mean downloading the whole history, which grows without a limit. The specification does not ask for statistics or filters, since F-6 only asks for viewing the past games, so the team decides first.
+- **Change:** in `platform-service.openapi.yaml` and in the platform-service, with the rules of ADR-8 for the names and the enums:
+  - Optional filters of `GET /api/games`, which combine with AND. `outcome` is `won`, `lost`, `draw` or `aborted` from the side of the signed-in user, `opponent` is `user` or `bot` by the kind of the other player, and `reason` is a `GameEndReason`, such as `resignation`. `totalCount` counts the games that match, so the pages stay right.
+  - A new `GET /api/games/stats` that counts every game of the user by outcome, by reason and by the kind of the opponent, in one answer.
+  - PS-ADR-13 describes the filters and the counts. Both fit the query of the games of a user, which already finds them by `white_user_id` or `black_user_id`, and the counts are one grouped query.
+  - The contract is in the infra repo, so the change starts there with a new version of the contract (ADR-7). The gateway needs no change, because its route for `/api` already sends every path under it to the platform-service with the token required.
+- **Frontend code this removes:** nothing. It allows a summary in the band of `src/pages/HistoryPage.tsx` and filters that live in the URL next to `page`, such as `/history?outcome=won&opponent=bot`. The frontend side changes FE-ADR-4 and FE-ADR-5.
+
 ## What the other repos should know
 
 These are decisions of the frontend (FE-ADR-5) that affect the load or the behavior of the other services. They need no change.

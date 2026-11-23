@@ -54,6 +54,8 @@ export function useAuthForm<Values extends Record<string, string>>(
     values,
     setValue,
     fieldErrors,
+    serverFieldErrors: serverErrors.fields,
+    submitted,
     message: serverErrors.message,
     isPending: mutation.isPending,
     onSubmit,
