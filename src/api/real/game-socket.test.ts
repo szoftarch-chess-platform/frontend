@@ -1,17 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createGameSocket } from './game-socket';
+import { ACK_TIMEOUT_MS, createGameSocket } from './game-socket';
 
 type Handler = (...args: unknown[]) => void;
 
 const socket = vi.hoisted(() => {
   const handlers = new Map<string, Handler>();
-  return {
+  const stub = {
     handlers,
     on: (event: string, handler: Handler) => handlers.set(event, handler),
     off: () => undefined,
     connect: vi.fn(),
     emit: (event: string, ...args: unknown[]) => handlers.get(event)?.(...args),
+    timeout: vi.fn(() => stub),
+    emitWithAck: vi.fn(),
   };
+  return stub;
 });
 
 vi.mock('socket.io-client', () => ({ io: () => socket }));
@@ -70,12 +73,20 @@ describe('the game socket', () => {
     expect(refresh).toHaveBeenCalledTimes(2);
   });
 
-  it('connects again when the server closes the connection', () => {
+  it('leaves a connection that the server closed on purpose closed', () => {
     createGameSocket(vi.fn());
-    socket.emit('disconnect', 'transport close');
-    expect(socket.connect).not.toHaveBeenCalled();
     socket.emit('disconnect', 'io server disconnect');
-    expect(socket.connect).toHaveBeenCalled();
+    expect(socket.connect).not.toHaveBeenCalled();
+  });
+
+  it('waits for an acknowledgement only for a limited time', async () => {
+    socket.emitWithAck.mockResolvedValue({ ok: true, queued: false });
+
+    const answer = await createGameSocket(vi.fn()).emitWithAck('getState', {});
+
+    expect(socket.timeout).toHaveBeenCalledWith(ACK_TIMEOUT_MS);
+    expect(socket.emitWithAck).toHaveBeenCalledWith('getState', {});
+    expect(answer).toEqual({ ok: true, queued: false });
   });
 
   it('reads a null field of an event as missing', () => {

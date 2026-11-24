@@ -21,9 +21,10 @@
 ## Open questions
 
 - The texts that the users see for the error codes of the game-service, because the `message` of its acknowledgements is only for the logs, and for the errors of the REST API that name no field, such as a wrong password, too many attempts or an unexpected error. The sign-in and registration forms use provisional texts until the team decides.
-- Whether the lobby shows how long the user has been waiting in the queue. The contract `game-service.asyncapi.yaml` sends no time of joining, so a count of the client would start again after a reload. The team decides it together with the contract, as [requests-to-other-repos.md](requests-to-other-repos.md) describes.
+- Whether the lobby shows how long the user has been waiting in the queue. A reload ends the waiting (ADR-10), so the tab that joined can count the time, but another tab of the user does not know when the waiting began. The team decides it together with the contract, as [requests-to-other-repos.md](requests-to-other-repos.md) describes.
 
 ## Next steps
 
 - Play the lobby and the game page against the game-service of `dev` through the gateway, which implements the contract `game-service.asyncapi.yaml` now.
+- Show the moves in SAN, which ADR-8 asks for now, in the replay, and decide whether the game page gets a move list. FE-ADR-4 still describes the list of the replay in UCI.
 - Test the flows end to end with Playwright in Chrome, Firefox and Edge (FE-ADR-8, NF-7).

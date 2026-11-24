@@ -3,6 +3,12 @@ import type { GameSocket } from '../game-socket';
 import type { ClientEvents, ServerEvents } from '../types/game';
 
 /**
+ * The game-service answers within milliseconds, so an acknowledgement that has not come by then never comes, and the
+ * event is refused with an error.
+ */
+export const ACK_TIMEOUT_MS = 10_000;
+
+/**
  * The browser does not see why a handshake failed, so a failed connect refreshes the tokens while
  * Socket.IO keeps retrying. After a successful refresh the next one waits until a connect succeeds.
  */
@@ -37,11 +43,6 @@ export function createGameSocket(
       () => settle('needed'),
     );
   });
-  socket.on('disconnect', (reason) => {
-    if (reason === 'io server disconnect') {
-      socket.connect();
-    }
-  });
 
   return {
     connect: () => {
@@ -52,10 +53,11 @@ export function createGameSocket(
     },
     emitWithAck: async (event, payload) =>
       withoutNulls(
-        await (socket.emitWithAck as (...args: unknown[]) => Promise<never>)(
-          event,
-          payload,
-        ),
+        await (
+          socket.timeout(ACK_TIMEOUT_MS).emitWithAck as (
+            ...args: unknown[]
+          ) => Promise<never>
+        )(event, payload),
       ),
     on: (event, handler) => {
       const listener = (...args: unknown[]) =>
