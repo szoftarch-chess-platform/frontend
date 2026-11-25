@@ -1,0 +1,11 @@
+# Generated or installed files.
+dist
+coverage
+node_modules
+package-lock.json
+
+# The documentation is formatted by hand.
+*.md
+
+# The settings of Claude Code have the same layout in every repo.
+.claude
