@@ -10,7 +10,7 @@ ADR-7 asks every consumer to replace its provider with a fake in its own repo, b
 
 - The app reaches the services only through own interfaces in `src/api/`, which are `AuthApi`, `GamesApi` and `GameSocket`. The pages, the queries and the store depend only on these.
 - Every interface has a real implementation, on the own HTTP client and on socket.io-client, and a fake one in `src/api/fake/`.
-- The fakes keep their data in memory, start from the examples of the contracts, and follow the rules of the contracts. Registration answers 409 for a user name or an email address that is taken. The fake socket checks the moves with chess.js, answers with a random legal move of the bot, pairs the queue with a fake opponent, runs the clocks and ends the game as ADR-10 describes. The tests can make the fakes refuse the next event or answer later.
+- The fakes keep their data in memory, start from the examples of the contracts, and follow the rules of the contracts. Registration answers 409 for a user name or an email address that is taken. The fake socket checks the moves with chess.js, answers with a random legal move of the bot, pairs the queue with a fake opponent, takes the user out of the queue when the connection closes, runs the clocks and ends the game as ADR-10 describes. The tests can make the fakes refuse the next event or answer later.
 - The HTTP client and the real socket are not used in the fake mode, so they have tests of their own.
 - The fake mode is the Vite mode `fake`, which `npm run dev:fake` starts. The committed `.env.fake` sets `VITE_FAKE_BACKEND`.
 - One module chooses the implementation by this variable, and it imports the fakes dynamically, so the production build does not contain them.

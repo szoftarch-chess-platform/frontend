@@ -8,7 +8,19 @@ import {
   useGameStore,
 } from './store';
 
-export const STATE_RETRY_MS = 2000;
+// A getState that was refused or not answered is asked again after a delay that doubles from 1 second up to 30
+// seconds. Each delay is a random share of its limit, so the tabs do not ask the game-service in step.
+const STATE_RETRY_BASE_MS = 1000;
+export const STATE_RETRY_MAX_MS = 30_000;
+
+export function stateRetryDelay(
+  attempt: number,
+  random: () => number = Math.random,
+): number {
+  return (
+    random() * Math.min(STATE_RETRY_MAX_MS, STATE_RETRY_BASE_MS * 2 ** attempt)
+  );
+}
 
 type GameEvents = {
   onGameStarted: () => void;
@@ -21,14 +33,24 @@ export function startGameConnection(
   { onGameStarted, onGameEnded }: GameEvents,
 ): () => void {
   let stopped = false;
+  let connected = false;
+  let attempt = 0;
   let retry: ReturnType<typeof setTimeout> | undefined;
+
+  // After a disconnect the next connect asks again.
+  function askLater() {
+    if (!stopped && connected) {
+      retry = setTimeout(askState, stateRetryDelay(attempt++));
+    }
+  }
 
   async function askState() {
     let answer;
     try {
       answer = await socket.emitWithAck('getState', {});
     } catch {
-      // The socket closed before the answer, and the next connect asks again.
+      // No answer came in time, or the socket closed before it.
+      askLater();
       return;
     }
     if (stopped) {
@@ -39,11 +61,13 @@ export function startGameConnection(
         applyState(store, answer, performance.now()),
       );
     } else {
-      retry = setTimeout(askState, STATE_RETRY_MS);
+      askLater();
     }
   }
 
   const offConnect = socket.on('connect', () => {
+    connected = true;
+    attempt = 0;
     clearTimeout(retry);
     void askState();
   });
@@ -65,6 +89,7 @@ export function startGameConnection(
     onGameEnded();
   });
   const offDisconnect = socket.on('disconnect', () => {
+    connected = false;
     clearTimeout(retry);
     useGameStore.setState({ connection: 'lost' });
   });

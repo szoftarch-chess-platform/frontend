@@ -27,6 +27,8 @@ export function createFakeGameSocket(runtime: FakeRuntime): GameSocket {
   const handlers = new Map<string, Set<(...args: never[]) => void>>();
   let attempt = 0;
   let wanted = false;
+  // The user whom the connection belongs to. The sign-out forgets the user before the connection closes.
+  let connectedUserId: string | undefined;
   let opponentTimer: ReturnType<typeof setTimeout> | undefined;
   // For each game: the user who plays it here, when its clock last changed, and the timer that
   // ends it on time.
@@ -276,6 +278,7 @@ export function createFakeGameSocket(runtime: FakeRuntime): GameSocket {
   return {
     connect: () => {
       wanted = true;
+      connectedUserId = runtime.state.signedInUserId;
       const current = ++attempt;
       void runtime
         .answer(() => undefined)
@@ -286,8 +289,12 @@ export function createFakeGameSocket(runtime: FakeRuntime): GameSocket {
         });
     },
 
+    // The only connection of the user closes, so the user leaves the queue as ADR-10 decides.
     disconnect: () => {
       wanted = false;
+      const { state } = runtime;
+      state.queue = state.queue.filter((id) => id !== connectedUserId);
+      clearTimeout(opponentTimer);
     },
 
     emitWithAck: <E extends ClientEvent>(event: E, payload: Payload<E>) =>

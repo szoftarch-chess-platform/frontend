@@ -52,6 +52,26 @@ describe('the fake game socket', () => {
     });
   });
 
+  it('leaves the queue when the connection closes', async () => {
+    const backend = createBackend({ delayMs: 0, opponentDelayMs: 0 });
+    await backend.auth.login({ userName: 'alice', password: EXAMPLE_PASSWORD });
+    const gameStarted = vi.fn();
+    backend.gameSocket.on('gameStarted', gameStarted);
+    backend.gameSocket.connect();
+    await backend.gameSocket.emitWithAck('joinQueue', {});
+
+    await backend.auth.logout();
+    backend.gameSocket.disconnect();
+    await opponentJoins();
+    await backend.auth.login({ userName: 'alice', password: EXAMPLE_PASSWORD });
+
+    expect(gameStarted).not.toHaveBeenCalled();
+    expect(await backend.gameSocket.emitWithAck('getState', {})).toEqual({
+      ok: true,
+      queued: false,
+    });
+  });
+
   it('starts a bot game at once and refuses a second one', async () => {
     const { socket, gameStarted } = await signedInSocket();
 
