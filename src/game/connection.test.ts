@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { GameSocket } from '../api/game-socket';
 import type { GameState, Rejected, State } from '../api/types/game';
 import {
@@ -35,6 +35,11 @@ function stubSocket(answers: (State | Rejected | Error)[]) {
 }
 
 describe('the game connection', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
   it('asks for the state after every connect and marks a lost connection', async () => {
     const { socket, emit } = stubSocket([
       { ok: true, queued: true },
@@ -109,8 +114,6 @@ describe('the game connection', () => {
     expect(socket.emitWithAck).toHaveBeenCalledTimes(3);
     expect(useGameStore.getState().status).toBe('queued');
     stop();
-    vi.restoreAllMocks();
-    vi.useRealTimers();
   });
 
   it('asks no more after a disconnect until the next connect', async () => {
@@ -135,7 +138,6 @@ describe('the game connection', () => {
     expect(socket.emitWithAck).toHaveBeenCalledTimes(2);
     expect(useGameStore.getState().connection).toBe('connected');
     stop();
-    vi.useRealTimers();
   });
 
   it('doubles the limit of the delay up to 30 seconds', () => {

@@ -10,8 +10,8 @@ import {
 
 // A getState that was refused or not answered is asked again after a delay that doubles from 1 second up to 30
 // seconds. Each delay is a random share of its limit, so the tabs do not ask the game-service in step.
-export const STATE_RETRY_BASE_MS = 1000;
-export const STATE_RETRY_MAX_MS = 30000;
+const STATE_RETRY_BASE_MS = 1000;
+export const STATE_RETRY_MAX_MS = 30_000;
 
 export function stateRetryDelay(
   attempt: number,

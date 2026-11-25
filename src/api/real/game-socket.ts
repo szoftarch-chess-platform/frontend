@@ -3,8 +3,8 @@ import type { GameSocket } from '../game-socket';
 import type { ClientEvents, ServerEvents } from '../types/game';
 
 /**
- * The game-service answers within milliseconds, so an acknowledgement that has not come by then never comes, and the
- * event is refused with an error.
+ * The game-service answers within milliseconds, so an acknowledgement that has not come by then is taken as lost, and
+ * the event fails with an error.
  */
 export const ACK_TIMEOUT_MS = 10_000;
 

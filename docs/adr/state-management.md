@@ -26,7 +26,7 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
 - **Socket:** the connection to `/ws/game` is open while a user is signed in, on every page, and it closes on sign-out and when the session ends.
   - Every event waits at most 10 seconds for its acknowledgement, and a missing one counts as a refusal for another reason.
   - After every connect the client asks `getState` and puts the answer into the store. If the game-service refuses it or does not answer, the client asks again while the connection stays open. The delay doubles from 1 second up to 30 seconds, and each delay is a random share of its limit.
-  - The browser does not see why a handshake failed, so after `connect_error` the client refreshes the tokens with the same function as the HTTP client, while Socket.IO keeps retrying. After a successful refresh it does not refresh again until a connect succeeds. A refresh that failed is tried again at the next `connect_error`, and a refresh answered with 401 signs the user out. A connection that the game-service closes on purpose stays closed, as Socket.IO intends.
+  - The browser does not see why a handshake failed, so after `connect_error` the client refreshes the tokens with the same function as the HTTP client, while Socket.IO keeps retrying. After a successful refresh it does not refresh again until a connect succeeds. A refresh that failed is tried again at the next `connect_error`, and a refresh answered with 401 signs the user out. A connection that the game-service refuses or closes on purpose stays closed, as Socket.IO intends.
   - The lobby sends `joinQueue`, `leaveQueue` and `startBotGame` with their controls disabled until `getState` has answered. A refusal with `alreadyInQueue`, `alreadyInGame` or `notInQueue` means that another tab acted first, so the lobby asks `getState` and follows it without a message. Any other refusal shows one general message.
   - The game page follows the same rule for `makeMove` and `resign`. A refusal with `notYourTurn`, `illegalMove` or `gameNotFound` means that the view of the client is old, so the piece goes back without a message and the client asks `getState`. Any other refusal puts the piece back and shows one general message.
   - Until `getState` has answered, the lobby and the game page show a banner, which says that the connection is lost after a disconnect.
@@ -40,9 +40,10 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
 - Pure functions for the changes can be tested without a socket.
 - The game-service keeps the user in the game whether a socket is open or not, and the clock runs on. It takes the user out of the queue only when the last connection closes (ADR-10). With the socket open on every page, no event is missed while the user looks at the history, and the user stays in the queue.
 - The access token lives 15 minutes, so a reconnect after a longer connection often fails until the tokens are refreshed. After a successful refresh the client waits for a connect, so a game-service that is down does not cause a refresh at every retry.
+- The game-service refuses or closes a connection only when the identity headers are missing, which a new connect does not bring, so connecting again would only loop.
 - The game-service sends no event when another tab joins or leaves the queue, so a refusal caused by another tab is answered by the state of the server instead of an error that the user cannot act on.
 - The board checks every move with chess.js before it is sent, so a refusal of a move comes from a race, such as another tab or the end of the game on time, which the user cannot act on.
-- A refused `getState` is most likely a passing failure of the game-service, and a retry needs no text for the users, whose wording is still open. The game-service answers within milliseconds, so an acknowledgement that has not come after 10 seconds never comes, and without a time limit the client would wait for it forever. A delay that grows with a random share keeps the tabs from asking in step after a failure, which the AWS Architecture Blog calls full jitter.
+- A refused `getState` is most likely a passing failure of the game-service, and a retry needs no text for the users, whose wording is still open. The game-service answers within milliseconds, so an acknowledgement that has not come after 10 seconds is taken as lost. Without a time limit the client would wait for it until the connection closes. A delay that grows with a random share keeps the tabs from asking in step after a failure, which the AWS Architecture Blog calls full jitter.
 - The Web Locks API is supported by Chrome, Firefox and Edge, which NF-7 names, and it is the way that the identity providers send one refresh across tabs, as ADR-4 describes.
 
 ## Rejected alternatives
@@ -72,5 +73,6 @@ ADR-4 asks that the client refreshes the tokens once after a 401 and repeats the
 - Zustand: https://github.com/pmndrs/zustand
 - MDN, Web Locks API: https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
 - Socket.IO, acknowledgements with a timeout: https://socket.io/docs/v4/emitting-events/#with-timeout
+- Socket.IO, a failed and a refused connect: https://socket.io/docs/v4/client-socket-instance/#connect_error
 - Socket.IO, the reasons of a disconnect: https://socket.io/docs/v4/client-socket-instance/#disconnect
 - AWS Architecture Blog, Exponential Backoff And Jitter: https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
