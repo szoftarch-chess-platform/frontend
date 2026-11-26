@@ -1,14 +1,17 @@
 import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react';
 
-// The theme of the app (FE-ADR-7). Components use only the semantic tokens below, never raw
-// colors, so another theme only gives these tokens other values. After a change of the token
-// names, run `npm run theme:types` to update the TypeScript types of the tokens.
+// The themes of the app (FE-ADR-7). Components use only the semantic tokens below, never raw
+// colors. The green theme is the base value of every token, and the brown theme gives a token
+// another value under the `_brown` condition, which holds while `<html>` has `data-theme="brown"`.
+// After a change of the token names, run `npm run theme:types` to update the TypeScript types.
 const config = defineConfig({
+  conditions: {
+    brown: '&[data-theme=brown], [data-theme=brown] &',
+  },
   theme: {
     tokens: {
       colors: {
-        // The brand color of the app. A palette with the shades that Chakra expects, so that
-        // `colorPalette="brand"` works on every component.
+        // The brand colors of the themes. Palettes with the shades that Chakra expects.
         brand: {
           50: { value: '#eef6ee' },
           100: { value: '#d4e9d3' },
@@ -22,19 +25,60 @@ const config = defineConfig({
           900: { value: '#0f2610' },
           950: { value: '#081608' },
         },
+        walnut: {
+          50: { value: '#f8f1ea' },
+          100: { value: '#ecdccb' },
+          200: { value: '#d9bb9a' },
+          300: { value: '#c39a6c' },
+          400: { value: '#ab7c4b' },
+          500: { value: '#8f6236' },
+          600: { value: '#744d2a' },
+          700: { value: '#5c3c21' },
+          800: { value: '#432b18' },
+          900: { value: '#2c1c10' },
+          950: { value: '#1a1009' },
+        },
       },
     },
     semanticTokens: {
       colors: {
-        // The roles that Chakra components read from the active color palette.
+        // The roles that Chakra components read from the active color palette, so that
+        // `colorPalette="brand"` follows the theme on every component.
         brand: {
-          solid: { value: '{colors.brand.600}' },
+          solid: {
+            value: {
+              base: '{colors.brand.600}',
+              _brown: '{colors.walnut.600}',
+            },
+          },
           contrast: { value: 'white' },
-          fg: { value: '{colors.brand.700}' },
-          muted: { value: '{colors.brand.100}' },
-          subtle: { value: '{colors.brand.50}' },
-          emphasized: { value: '{colors.brand.200}' },
-          focusRing: { value: '{colors.brand.500}' },
+          fg: {
+            value: {
+              base: '{colors.brand.700}',
+              _brown: '{colors.walnut.700}',
+            },
+          },
+          muted: {
+            value: {
+              base: '{colors.brand.100}',
+              _brown: '{colors.walnut.100}',
+            },
+          },
+          subtle: {
+            value: { base: '{colors.brand.50}', _brown: '{colors.walnut.50}' },
+          },
+          emphasized: {
+            value: {
+              base: '{colors.brand.200}',
+              _brown: '{colors.walnut.200}',
+            },
+          },
+          focusRing: {
+            value: {
+              base: '{colors.brand.500}',
+              _brown: '{colors.walnut.500}',
+            },
+          },
         },
         // A palette for actions that cannot be undone, such as resigning.
         danger: {
@@ -47,26 +91,41 @@ const config = defineConfig({
           focusRing: { value: '{colors.red.500}' },
         },
         board: {
-          light: { value: '#dde8cf' },
-          dark: { value: '{colors.brand.700}' },
+          light: { value: { base: '#dde8cf', _brown: '#f0d9b5' } },
+          dark: { value: { base: '{colors.brand.700}', _brown: '#b58863' } },
         },
         highlight: {
           lastMove: { value: 'rgba(214, 222, 96, 0.7)' },
           selected: { value: 'rgba(214, 222, 96, 0.9)' },
           legalMove: { value: 'rgba(214, 222, 96, 0.95)' },
-          legalMoveRing: { value: 'rgba(8, 22, 8, 0.55)' },
+          legalMoveRing: {
+            value: {
+              base: 'rgba(8, 22, 8, 0.55)',
+              _brown: 'rgba(26, 16, 9, 0.55)',
+            },
+          },
           check: { value: 'rgba(220, 38, 38, 0.85)' },
         },
         clock: {
           low: { value: '{colors.red.600}' },
           running: {
-            bg: { value: '{colors.brand.700}' },
+            bg: {
+              value: {
+                base: '{colors.brand.700}',
+                _brown: '{colors.walnut.700}',
+              },
+            },
             fg: { value: 'white' },
           },
         },
         // The band at the top of the lobby.
         hero: {
-          bg: { value: '{colors.brand.800}' },
+          bg: {
+            value: {
+              base: '{colors.brand.800}',
+              _brown: '{colors.walnut.800}',
+            },
+          },
           fg: { value: 'white' },
           subtle: { value: '{colors.whiteAlpha.200}' },
         },

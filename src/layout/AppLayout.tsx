@@ -15,6 +15,7 @@ import { NavLink, Link as RouterLink, Outlet } from 'react-router';
 import { useBackend } from '../api/backend-context';
 import { setSignedOut, useCurrentUser } from '../auth/current-user';
 import { FakeBackendBadge } from './FakeBackendBadge';
+import { ThemeSwitch } from './ThemeSwitch';
 
 /** The header with the navigation, and the page below it. */
 export function AppLayout() {
@@ -33,8 +34,8 @@ export function AppLayout() {
     <Box minH="100vh" bg="bg.subtle" overflowX="clip">
       <Box as="header" bg="bg" borderBottomWidth="1px">
         <Container>
-          <Flex h="16" align="center" justify="space-between" gap="6">
-            <HStack gap="3">
+          <Flex h="16" align="center" gap={{ base: '2', sm: '4', md: '6' }}>
+            <HStack gap={{ base: '2', sm: '3' }}>
               <Link
                 asChild
                 display="flex"
@@ -46,9 +47,11 @@ export function AppLayout() {
                 textDecoration="none"
                 _hover={{ textDecoration: 'none' }}
               >
-                <RouterLink to="/">
+                <RouterLink to="/" aria-label="Chess7ed">
                   <Image src="/logo.png" alt="" boxSize="8" />
-                  Chess7ed
+                  <Text as="span" hideBelow="sm">
+                    Chess7ed
+                  </Text>
                 </RouterLink>
               </Link>
               <FakeBackendBadge />
@@ -64,22 +67,30 @@ export function AppLayout() {
             )}
 
             {user && (
-              <HStack gap="3">
+              <HStack gap="3" ms="auto">
                 {signOut.isError && (
-                  <Text color="fg.error" fontSize="sm" role="alert">
+                  <Text
+                    color="fg.error"
+                    fontSize="sm"
+                    role="alert"
+                    hideBelow="md"
+                  >
                     Sign-out failed. Try again.
                   </Text>
                 )}
-                <HStack gap="2">
+                <HStack gap="2" hideBelow="sm">
                   <Avatar.Root size="xs" colorPalette="brand">
                     <Avatar.Fallback name={user.userName} />
                   </Avatar.Root>
-                  <Text fontWeight="medium">{user.userName}</Text>
+                  <Text fontWeight="medium" hideBelow="md">
+                    {user.userName}
+                  </Text>
                 </HStack>
                 <Button
-                  size="sm"
+                  size={{ base: 'xs', sm: 'sm' }}
                   variant="ghost"
                   rounded="full"
+                  colorPalette={signOut.isError ? 'danger' : undefined}
                   loading={signOut.isPending}
                   onClick={() => signOut.mutate()}
                 >
@@ -91,9 +102,11 @@ export function AppLayout() {
         </Container>
       </Box>
 
-      <Container as="main" py="10">
+      <Container as="main" pt="10" pb="20">
         <Outlet />
       </Container>
+
+      <ThemeSwitch />
     </Box>
   );
 }
@@ -110,7 +123,7 @@ function NavItem({
   return (
     <Link
       asChild
-      px="3"
+      px={{ base: '2', sm: '3' }}
       py="1.5"
       rounded="full"
       fontWeight="medium"
