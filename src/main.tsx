@@ -6,6 +6,9 @@ import { loadBackend } from './api';
 import { AppProviders } from './app/AppProviders';
 import { createQueryClient } from './app/query-client';
 import { setSignedOut } from './auth/current-user';
+import { applyTheme, savedTheme } from './theme/theme-choice';
+
+applyTheme(savedTheme(), false);
 
 const queryClient = createQueryClient();
 

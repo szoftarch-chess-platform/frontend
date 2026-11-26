@@ -61,13 +61,20 @@ function toMove(move: UciMove) {
   };
 }
 
-/** Every position of a game from the start, so `positions[n]` is the position after `n` moves. */
-export function positionsOf(moves: UciMove[]): Fen[] {
+/**
+ * Replays a game from the start. `positions[n]` is the position after `n` moves, and `san[n]` is
+ * move `n + 1` in SAN, such as `Nf3`, which players read more easily than UCI.
+ */
+export function replayOf(moves: UciMove[]): {
+  positions: Fen[];
+  san: string[];
+} {
   const chess = new Chess();
   const positions = [chess.fen()];
+  const san: string[] = [];
   for (const move of moves) {
-    chess.move(toMove(move));
+    san.push(chess.move(toMove(move)).san);
     positions.push(chess.fen());
   }
-  return positions;
+  return { positions, san };
 }

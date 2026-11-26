@@ -69,6 +69,7 @@ export function ChessBoard({
     <Box
       w={{ base: 'full', lg: size }}
       maxW={size}
+      justifySelf="center"
       rounded="2xl"
       overflow="hidden"
       shadow="2xl"
