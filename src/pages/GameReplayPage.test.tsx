@@ -25,12 +25,16 @@ describe('the replay', () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText(`Move ${total} of ${total}`)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Qxf7#' })).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
 
     await userEvent.click(screen.getByRole('button', { name: 'First move' }));
     expect(screen.getByText(`Move 0 of ${total}`)).toBeInTheDocument();
     await userEvent.keyboard('{ArrowRight}{ArrowRight}');
     expect(screen.getByText(`Move 2 of ${total}`)).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: game.moves[0] }));
+    await userEvent.click(screen.getByRole('button', { name: 'e4' }));
     expect(screen.getByText(`Move 1 of ${total}`)).toBeInTheDocument();
   });
 

@@ -21,7 +21,7 @@ import { useCurrentUser } from '../auth/current-user';
 import { ChessBoard } from '../game/ChessBoard';
 import { colorOf, outcomeFor, reasonText } from '../game/outcome';
 import { OutcomeBadge } from '../game/OutcomeBadge';
-import { checkedKing, positionsOf } from '../game/rules';
+import { checkedKing, replayOf } from '../game/rules';
 import { HeroBand } from '../layout/HeroBand';
 
 // A game reaches the history through the message broker, so right after its end it may be missing.
@@ -81,7 +81,7 @@ export function GameReplayPage() {
 
 function Replay({ game }: { game: GameDetails }) {
   const { data: user } = useCurrentUser();
-  const positions = positionsOf(game.moves);
+  const { positions, san } = replayOf(game.moves);
   const last = game.moves.length;
   const [ply, setPly] = useState(last);
   const go = (next: number) => setPly(Math.max(0, Math.min(last, next)));
@@ -148,7 +148,7 @@ function Replay({ game }: { game: GameDetails }) {
               Move {ply} of {last}
             </Text>
           </HStack>
-          <MoveList moves={game.moves} ply={ply} onSelect={setPly} />
+          <MoveList moves={san} ply={ply} onSelect={setPly} />
           <HStack gap="2" justify="center">
             <StepButton
               label="First move"
@@ -194,7 +194,7 @@ function Replay({ game }: { game: GameDetails }) {
   );
 }
 
-/** The moves in UCI, numbered in pairs of white and black. A move opens its position. */
+/** The moves in SAN, numbered in pairs of white and black. A move opens its position. */
 function MoveList({
   moves,
   ply,

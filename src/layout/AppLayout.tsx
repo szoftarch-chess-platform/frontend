@@ -4,8 +4,8 @@ import {
   Button,
   Container,
   Flex,
-  Grid,
   HStack,
+  Image,
   Link,
   Text,
 } from '@chakra-ui/react';
@@ -47,8 +47,8 @@ export function AppLayout() {
                 _hover={{ textDecoration: 'none' }}
               >
                 <RouterLink to="/">
-                  <BoardMark />
-                  Chess Platform
+                  <Image src="/logo.png" alt="" boxSize="8" />
+                  Chess7ed
                 </RouterLink>
               </Link>
               <FakeBackendBadge />
@@ -125,23 +125,5 @@ function NavItem({
         {children}
       </NavLink>
     </Link>
-  );
-}
-
-/** Four squares of the board as the logo. */
-function BoardMark() {
-  return (
-    <Grid
-      aria-hidden
-      templateColumns="repeat(2, 1fr)"
-      boxSize="6"
-      rounded="md"
-      overflow="hidden"
-    >
-      <Box bg="board.light" />
-      <Box bg="board.dark" />
-      <Box bg="board.dark" />
-      <Box bg="board.light" />
-    </Grid>
   );
 }
