@@ -31,21 +31,22 @@ export function PromotionDialog({
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content rounded="2xl" maxW="sm">
+          <Dialog.Content rounded="2xl" maxW="md">
             <Dialog.Header>
               <Dialog.Title>Promote the pawn to</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body pb="6">
-              <HStack gap="3" justify="center">
+              <HStack gap={{ base: '2', sm: '3' }} justify="center">
                 {PIECES.map(({ letter, name }) => (
                   <Button
                     key={letter}
                     aria-label={name}
                     variant="subtle"
-                    boxSize="16"
+                    boxSize={{ base: '16', sm: '20' }}
                     p="1.5"
                     rounded="xl"
                     bg="board.light"
+                    _icon={{ width: 'full', height: 'full' }}
                     onClick={() => onChoose(letter)}
                   >
                     {defaultPieces[`${prefix}${letter.toUpperCase()}`]()}

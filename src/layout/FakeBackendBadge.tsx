@@ -8,7 +8,11 @@ export function FakeBackendBadge() {
     return null;
   }
   return (
-    <Badge colorPalette="orange" variant="solid" size="md">
+    <Badge
+      colorPalette="orange"
+      variant="solid"
+      size={{ base: 'xs', md: 'md' }}
+    >
       FAKE BACKEND
     </Badge>
   );

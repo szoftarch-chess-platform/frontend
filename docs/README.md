@@ -26,5 +26,5 @@
 ## Next steps
 
 - Play the lobby and the game page against the game-service of `dev` through the gateway, which implements the contract `game-service.asyncapi.yaml` now.
-- Show the moves in SAN, which ADR-8 asks for now, in the replay, and decide whether the game page gets a move list. FE-ADR-4 still describes the list of the replay in UCI.
+- Decide whether the game page gets a move list in SAN, as the replay has.
 - Test the flows end to end with Playwright in Chrome, Firefox and Edge (FE-ADR-8, NF-7).
